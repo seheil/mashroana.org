@@ -8,13 +8,6 @@
       "when": 1776435038459,
       "tag": "0000_stiff_sumo",
       "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1776436392689,
-      "tag": "0001_purple_the_watchers",
-      "breakpoints": true
     }
   ]
 }

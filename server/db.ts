@@ -1,6 +1,6 @@
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, statistics, donations, InsertDonation, contactRequests, InsertContactRequest, projects, InsertProject } from "../drizzle/schema";
+import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,77 +89,4 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// Statistics queries
-export async function getStatistics() {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.select().from(statistics).limit(1);
-  return result.length > 0 ? result[0] : null;
-}
-
-export async function updateStatistics(data: Partial<typeof statistics.$inferInsert>) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.update(statistics).set(data);
-  return result;
-}
-
-// Donations queries
-export async function createDonation(donation: InsertDonation) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.insert(donations).values(donation);
-  return result;
-}
-
-export async function getDonations(limit = 50) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(donations).orderBy(desc(donations.createdAt)).limit(limit);
-}
-
-export async function getDonationById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.select().from(donations).where(eq(donations.id, id)).limit(1);
-  return result.length > 0 ? result[0] : null;
-}
-
-// Contact requests queries
-export async function createContactRequest(request: InsertContactRequest) {
-  const db = await getDb();
-  if (!db) return null;
-  return await db.insert(contactRequests).values(request);
-}
-
-export async function getContactRequests(limit = 50) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(contactRequests).orderBy(desc(contactRequests.createdAt)).limit(limit);
-}
-
-// Projects queries
-export async function getProjects() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(projects).orderBy(projects.createdAt);
-}
-
-export async function getProjectById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
-  return result.length > 0 ? result[0] : null;
-}
-
-export async function createProject(project: InsertProject) {
-  const db = await getDb();
-  if (!db) return null;
-  return await db.insert(projects).values(project);
-}
-
-export async function updateProject(id: number, data: Partial<typeof projects.$inferInsert>) {
-  const db = await getDb();
-  if (!db) return null;
-  return await db.update(projects).set(data).where(eq(projects.id, id));
-}
+// TODO: add feature queries here as your schema grows.
