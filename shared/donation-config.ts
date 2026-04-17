@@ -2,21 +2,17 @@
 
 export const DONATION_METHODS = {
   whatsapp: "01013128453",
-  instapay: "01013128453",
-  wallets: {
-    vodafone: {
-      name: "Vodafone Cash",
-      number: "01013128453",
-    },
-    etisalat: {
-      name: "Etisalat Cash",
-      number: "01013128453",
-    },
-    orange: {
-      name: "Orange Cash",
-      number: "01013128453",
-    },
-  },
+  instapay_link: "https://ipn.eg/S/hanan.gamal97/instapay/7EswbJ",
+  instapay_number: "010",
+};
+
+// الإحصائيات
+export const STATISTICS = {
+  students: { current: 51, target: 100 },
+  orphans: { current: 0, target: 500 },
+  families: { current: 0, target: 1000 },
+  totalBeneficiaries: { current: 51, target: 2000 },
+  complex: { current: 500000, target: 2000000 }, // المجمع الخيري
 };
 
 export const PROJECTS_DATA = [
@@ -55,6 +51,9 @@ export const PROJECTS_DATA = [
     details: "هدفنا بناء مجمع خيري شامل يضم مسجد، مركز طبي، مؤسسة خيرية، مشغل للنساء الأرامل والمطلقات، ومركز تعليم علوم شرعية",
     goal: "السهم بـ 1000 جنيه - شارك في الخير الدائم",
     isSpecial: true,
+    hasProgressBar: true,
+    current: 500000,
+    target: 2000000,
   },
   {
     id: 6,

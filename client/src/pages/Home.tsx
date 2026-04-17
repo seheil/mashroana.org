@@ -1,20 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Users, BookOpen, Gift, Phone, MessageCircle, ExternalLink } from "lucide-react";
-import { DONATION_METHODS, PROJECTS_DATA } from "@shared/donation-config";
+import { Heart, Users, BookOpen, Gift, Phone, MessageCircle, ExternalLink, Zap } from "lucide-react";
+import { DONATION_METHODS, PROJECTS_DATA, STATISTICS } from "@shared/donation-config";
 import { useState } from "react";
 import { toast } from "sonner";
-
-const STATS = {
-  studentCount: 51,
-  studentTarget: 100,
-  orphanCount: 0,
-  orphanTarget: 500,
-  familyCount: 0,
-  familyTarget: 1000,
-  totalBeneficiaries: 51,
-  totalBeneficiariesTarget: 2000,
-};
 
 export default function Home() {
   const [donationForm, setDonationForm] = useState({
@@ -22,7 +11,6 @@ export default function Home() {
     donorEmail: "",
     donorPhone: "",
     amount: "",
-    paymentMethod: "instapay",
     message: "",
   });
 
@@ -34,36 +22,15 @@ export default function Home() {
       return;
     }
 
-    const amount = parseFloat(donationForm.amount);
-    const method = donationForm.paymentMethod;
-    const whatsappNumber = DONATION_METHODS.whatsapp.replace(/\D/g, "");
-    
-    let message = `مرحباً، أود التبرع بمبلغ ${amount} جنيه عن طريق ${method}`;
-    if (donationForm.message) {
-      message += `\n\nرسالة: ${donationForm.message}`;
-    }
-    if (donationForm.donorName) {
-      message += `\n\nالاسم: ${donationForm.donorName}`;
-    }
-    if (donationForm.donorEmail) {
-      message += `\nالبريد الإلكتروني: ${donationForm.donorEmail}`;
-    }
-    if (donationForm.donorPhone) {
-      message += `\nالهاتف: ${donationForm.donorPhone}`;
-    }
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, "_blank");
-    toast.success("تم فتح الواتساب - شكراً لتبرعك الكريم!");
+    // فتح InstaPay مباشرة
+    window.open(DONATION_METHODS.instapay_link, "_blank");
+    toast.success("تم فتح InstaPay - شكراً لتبرعك الكريم!");
     
     setDonationForm({
       donorName: "",
       donorEmail: "",
       donorPhone: "",
       amount: "",
-      paymentMethod: "instapay",
       message: "",
     });
   };
@@ -75,7 +42,7 @@ export default function Home() {
         <Button 
           size="lg" 
           className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg"
-          onClick={() => document.getElementById("donate-section")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
         >
           <Heart className="w-5 h-5 ml-2" />
           تبرع الآن
@@ -101,7 +68,7 @@ export default function Home() {
             <Button 
               size="lg"
               className="bg-emerald-500 hover:bg-emerald-600 text-white"
-              onClick={() => document.getElementById("donate-section")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
             >
               <Heart className="w-5 h-5 ml-2" />
               تبرع الآن
@@ -124,7 +91,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">إحصائياتنا</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <BookOpen className="w-6 h-6" />
@@ -133,19 +100,19 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-white mb-2">
-                  {STATS.studentCount}
+                  {STATISTICS.students.current}
                 </div>
                 <div className="w-full bg-slate-600 rounded-full h-2">
                   <div 
                     className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATS.studentCount / STATS.studentTarget) * 100}%` }}
+                    style={{ width: `${(STATISTICS.students.current / STATISTICS.students.target) * 100}%` }}
                   />
                 </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATS.studentTarget}</p>
+                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.students.target}</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Users className="w-6 h-6" />
@@ -154,19 +121,19 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-white mb-2">
-                  {STATS.orphanCount}
+                  {STATISTICS.orphans.current}
                 </div>
                 <div className="w-full bg-slate-600 rounded-full h-2">
                   <div 
                     className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATS.orphanCount / STATS.orphanTarget) * 100}%` }}
+                    style={{ width: `${(STATISTICS.orphans.current / STATISTICS.orphans.target) * 100}%` }}
                   />
                 </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATS.orphanTarget}</p>
+                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.orphans.target}</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Heart className="w-6 h-6" />
@@ -175,19 +142,19 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-white mb-2">
-                  {STATS.familyCount}
+                  {STATISTICS.families.current}
                 </div>
                 <div className="w-full bg-slate-600 rounded-full h-2">
                   <div 
                     className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATS.familyCount / STATS.familyTarget) * 100}%` }}
+                    style={{ width: `${(STATISTICS.families.current / STATISTICS.families.target) * 100}%` }}
                   />
                 </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATS.familyTarget}</p>
+                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.families.target}</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Gift className="w-6 h-6" />
@@ -196,15 +163,15 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-white mb-2">
-                  {STATS.totalBeneficiaries}
+                  {STATISTICS.totalBeneficiaries.current}
                 </div>
                 <div className="w-full bg-slate-600 rounded-full h-2">
                   <div 
                     className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATS.totalBeneficiaries / STATS.totalBeneficiariesTarget) * 100}%` }}
+                    style={{ width: `${(STATISTICS.totalBeneficiaries.current / STATISTICS.totalBeneficiaries.target) * 100}%` }}
                   />
                 </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATS.totalBeneficiariesTarget}</p>
+                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.totalBeneficiaries.target}</p>
               </CardContent>
             </Card>
           </div>
@@ -216,39 +183,56 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">مشاريعنا الخيرية</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROJECTS_DATA.map((project: any) => (
+            {PROJECTS_DATA.map((project) => (
               <Card 
                 key={project.id} 
-                className={`border-slate-600 hover:border-emerald-500 transition ${
+                className={`bg-gradient-to-br border-emerald-500/30 hover:border-emerald-500/60 transition overflow-hidden ${
                   project.isSpecial 
-                    ? "bg-gradient-to-br from-emerald-900 to-slate-700 border-emerald-500" 
-                    : "bg-slate-700"
+                    ? "from-emerald-900/20 to-slate-800 lg:col-span-2" 
+                    : "from-slate-700 to-slate-800"
                 }`}
               >
                 <CardHeader>
-                  <CardTitle className={project.isSpecial ? "text-emerald-300" : "text-emerald-400"}>
+                  <CardTitle className="text-emerald-400 text-xl">
                     {project.name}
                   </CardTitle>
-                  <CardDescription className={project.isSpecial ? "text-emerald-200" : "text-slate-400"}>
+                  <CardDescription className="text-slate-300">
                     {project.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-slate-300 mb-4">{project.details}</p>
-                  <div className={`text-sm font-semibold ${project.isSpecial ? "text-emerald-300" : "text-emerald-400"}`}>
-                    {project.goal}
-                  </div>
-                  {project.isSpecial && (
-                    <div className="mt-4 p-3 bg-emerald-900/50 rounded text-emerald-200 text-sm">
-                      <p className="mb-2">🤍 شارك في الخير الدائم:</p>
-                      <ul className="space-y-1 text-xs">
-                        <li>⛔ صدقة جارية في بناء مسجد</li>
-                        <li>⛔ مركز طبي لعلاج المرضى</li>
-                        <li>⛔ مؤسسة خيرية وتجهيز العرائس</li>
-                        <li>⛔ مشغل للنساء الأرامل والمطلقات</li>
-                        <li>⛔ مكان تعليم علوم شرعية</li>
-                      </ul>
+                <CardContent className="space-y-4">
+                  <p className="text-slate-300">{project.details}</p>
+                  
+                  {project.hasProgressBar ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-emerald-400 font-semibold">السهم: 1000 جنيه</span>
+                        <span className="text-slate-400">
+                          {project.current?.toLocaleString('ar-EG')} / {project.target?.toLocaleString('ar-EG')}
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-600 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-3 rounded-full transition-all" 
+                          style={{ width: `${((project.current || 0) / (project.target || 1)) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-slate-400">
+                        {Math.round(((project.current || 0) / (project.target || 1)) * 100)}% من الهدف
+                      </p>
+                      <div className="bg-slate-700/50 p-4 rounded-lg mt-4 space-y-2">
+                        <p className="text-emerald-300 font-semibold">🤍 شارك في الخير الدائم:</p>
+                        <ul className="text-slate-300 text-sm space-y-1">
+                          <li>⛔ صدقة جارية في بناء مسجد</li>
+                          <li>⛔ مركز طبي لعلاج المرضى</li>
+                          <li>⛔ مؤسسة خيرية وتجهيز العرائس</li>
+                          <li>⛔ مشغل للنساء الأرامل والمطلقات</li>
+                          <li>⛔ مكان تعليم علوم شرعية</li>
+                        </ul>
+                      </div>
                     </div>
+                  ) : (
+                    <p className="text-emerald-400 font-semibold">{project.goal}</p>
                   )}
                 </CardContent>
               </Card>
@@ -257,32 +241,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Achievements Gallery Section */}
+      {/* Achievements Section */}
       <section className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">إنجازاتنا من الواقع</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div 
-                key={item}
-                className="bg-slate-700 rounded-lg overflow-hidden hover:shadow-lg transition transform hover:scale-105"
-              >
-                <div className="w-full h-48 bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 overflow-hidden hover:border-emerald-500/60 transition">
+                <div className="w-full h-48 bg-gradient-to-br from-emerald-500/20 to-slate-700 flex items-center justify-center">
                   <div className="text-center">
-                    <Gift className="w-16 h-16 mx-auto mb-2 text-white opacity-50" />
-                    <p className="text-white text-sm">صورة الإنجاز #{item}</p>
+                    <Gift className="w-12 h-12 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-slate-400">صورة الإنجاز #{i}</p>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-emerald-400 font-semibold mb-2">إنجاز {item}</h3>
+                <CardContent className="p-4">
+                  <h3 className="text-emerald-400 font-bold mb-2">إنجاز {i}</h3>
                   <p className="text-slate-300 text-sm">قصة نجاح من مشاريعنا الخيرية</p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-          <p className="text-center text-slate-400 mt-8 text-sm">
-            * سيتم إضافة صور الإنجازات الفعلية قريباً
-          </p>
+          <p className="text-center text-slate-400 mt-8">* سيتم إضافة صور الإنجازات الفعلية قريباً</p>
         </div>
       </section>
 
@@ -291,89 +270,78 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">تبرع الآن</h2>
           
-          <form onSubmit={handleDonationSubmit} className="bg-slate-700 p-8 rounded-lg mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="اسمك (اختياري)"
-                value={donationForm.donorName}
-                onChange={(e) => setDonationForm({ ...donationForm, donorName: e.target.value })}
-                className="bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none"
-              />
-              <input
-                type="email"
-                placeholder="بريدك الإلكتروني (اختياري)"
-                value={donationForm.donorEmail}
-                onChange={(e) => setDonationForm({ ...donationForm, donorEmail: e.target.value })}
-                className="bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <input
-                type="tel"
-                placeholder="رقم الهاتف (اختياري)"
-                value={donationForm.donorPhone}
-                onChange={(e) => setDonationForm({ ...donationForm, donorPhone: e.target.value })}
-                className="bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none"
-              />
-              <input
-                type="number"
-                placeholder="المبلغ (بالجنيه)"
-                value={donationForm.amount}
-                onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })}
-                className="bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none"
-                required
-              />
-            </div>
-
-            <select
-              value={donationForm.paymentMethod}
-              onChange={(e) => setDonationForm({ ...donationForm, paymentMethod: e.target.value })}
-              className="w-full bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none mb-4"
-            >
-              <option value="instapay">InstaPay</option>
-              <option value="vodafone_cash">Vodafone Cash</option>
-              <option value="etisalat_cash">Etisalat Cash</option>
-              <option value="orange_cash">Orange Cash</option>
-            </select>
-
-            <textarea
-              placeholder="رسالة (اختيارية)"
-              value={donationForm.message}
-              onChange={(e) => setDonationForm({ ...donationForm, message: e.target.value })}
-              className="w-full bg-slate-600 text-white px-4 py-2 rounded border border-slate-500 focus:border-emerald-500 focus:outline-none mb-4"
-              rows={3}
-            />
-
+          <div className="space-y-6">
+            {/* Quick Donate Button */}
             <Button 
-              type="submit" 
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+              size="lg"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6"
+              onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
             >
-              <ExternalLink className="w-5 h-5 ml-2" />
-              تبرع عبر الواتساب
+              <Zap className="w-6 h-6 ml-2" />
+              تبرع عبر InstaPay مباشرة
             </Button>
-          </form>
 
-          {/* Payment Methods */}
-          <div className="bg-slate-700 p-6 rounded-lg">
-            <h3 className="text-emerald-400 font-bold mb-4">طرق الدفع المتاحة</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <p className="text-slate-300"><span className="font-semibold">InstaPay:</span> {DONATION_METHODS.instapay}</p>
+            {/* Donation Form */}
+            <form onSubmit={handleDonationSubmit} className="bg-slate-700/50 p-6 rounded-lg space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="اسمك (اختياري)"
+                  value={donationForm.donorName}
+                  onChange={(e) => setDonationForm({...donationForm, donorName: e.target.value})}
+                  className="bg-slate-600 text-white placeholder-slate-400 rounded px-4 py-2 border border-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
+                <input
+                  type="email"
+                  placeholder="بريدك الإلكتروني (اختياري)"
+                  value={donationForm.donorEmail}
+                  onChange={(e) => setDonationForm({...donationForm, donorEmail: e.target.value})}
+                  className="bg-slate-600 text-white placeholder-slate-400 rounded px-4 py-2 border border-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <p className="text-slate-300"><span className="font-semibold">Vodafone Cash:</span> {DONATION_METHODS.wallets.vodafone.number}</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="tel"
+                  placeholder="رقم الهاتف (اختياري)"
+                  value={donationForm.donorPhone}
+                  onChange={(e) => setDonationForm({...donationForm, donorPhone: e.target.value})}
+                  className="bg-slate-600 text-white placeholder-slate-400 rounded px-4 py-2 border border-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
+                <input
+                  type="number"
+                  placeholder="المبلغ (بالجنيه)"
+                  value={donationForm.amount}
+                  onChange={(e) => setDonationForm({...donationForm, amount: e.target.value})}
+                  className="bg-slate-600 text-white placeholder-slate-400 rounded px-4 py-2 border border-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <p className="text-slate-300"><span className="font-semibold">Etisalat Cash:</span> {DONATION_METHODS.wallets.etisalat.number}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <p className="text-slate-300"><span className="font-semibold">Orange Cash:</span> {DONATION_METHODS.wallets.orange.number}</p>
+
+              <textarea
+                placeholder="رسالة (اختيارية)"
+                value={donationForm.message}
+                onChange={(e) => setDonationForm({...donationForm, message: e.target.value})}
+                rows={3}
+                className="w-full bg-slate-600 text-white placeholder-slate-400 rounded px-4 py-2 border border-slate-500 focus:border-emerald-500 focus:outline-none"
+              />
+
+              <Button 
+                type="submit"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+              >
+                <ExternalLink className="w-5 h-5 ml-2" />
+                تبرع عبر InstaPay
+              </Button>
+            </form>
+
+            {/* Payment Methods */}
+            <div className="bg-slate-700 p-6 rounded-lg">
+              <h3 className="text-emerald-400 font-bold mb-4">طرق الدفع المتاحة</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  <p className="text-slate-300"><span className="font-semibold">InstaPay:</span> {DONATION_METHODS.instapay_number}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -386,7 +354,7 @@ export default function Home() {
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">تواصل معنا</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Phone className="w-6 h-6" />
@@ -406,7 +374,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-700 border-slate-600">
+            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <MessageCircle className="w-6 h-6" />
