@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Users, BookOpen, Gift, Phone, MessageCircle } from "lucide-react";
-import { DONATION_METHODS } from "@shared/donation-config";
+import { Heart, Users, BookOpen, Gift, Phone, MessageCircle, ExternalLink } from "lucide-react";
+import { DONATION_METHODS, PROJECTS_DATA } from "@shared/donation-config";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,15 +15,6 @@ const STATS = {
   totalBeneficiaries: 51,
   totalBeneficiariesTarget: 2000,
 };
-
-const PROJECTS = [
-  { id: 1, name: "الإغاثة الدولية", description: "مساعدة الدول المنكوبة", details: "نقدم المساعدات الإنسانية للدول التي تعاني من الأزمات والكوارث", goal: "الوصول إلى 10,000 شخص" },
-  { id: 2, name: "تجهيز العرائس", description: "مساعدة الفتيات الفقيرات", details: "تجهيز الفتيات الفقيرات للزواج بكرامة وعفة", goal: "تجهيز 100 عروس سنوياً" },
-  { id: 3, name: "كسوة الأعياد", description: "إفراح الأطفال الفقراء", details: "توفير ملابس جديدة للأطفال المحتاجين في الأعياد", goal: "كسوة 5,000 طفل" },
-  { id: 4, name: "كفالة الأيتام", description: "رعاية الأطفال الأيتام", details: "توفير الرعاية والتعليم والصحة للأطفال الأيتام", goal: "كفالة 500 يتيم" },
-  { id: 5, name: "المجمعات الخيرية", description: "مراكز خدمات متكاملة", details: "إنشاء مراكز تقدم خدمات صحية وتعليمية واجتماعية", goal: "إنشاء 10 مجمعات" },
-  { id: 6, name: "زراعة النخيل", description: "مشروع اقتصادي مستدام", details: "زراعة النخيل لتوفير دخل مستدام للأسر الفقيرة", goal: "زراعة 1,000 نخلة" },
-];
 
 export default function Home() {
   const [donationForm, setDonationForm] = useState({
@@ -43,7 +34,30 @@ export default function Home() {
       return;
     }
 
-    toast.success("شكراً لتبرعك الكريم!");
+    const amount = parseFloat(donationForm.amount);
+    const method = donationForm.paymentMethod;
+    const whatsappNumber = DONATION_METHODS.whatsapp.replace(/\D/g, "");
+    
+    let message = `مرحباً، أود التبرع بمبلغ ${amount} جنيه عن طريق ${method}`;
+    if (donationForm.message) {
+      message += `\n\nرسالة: ${donationForm.message}`;
+    }
+    if (donationForm.donorName) {
+      message += `\n\nالاسم: ${donationForm.donorName}`;
+    }
+    if (donationForm.donorEmail) {
+      message += `\nالبريد الإلكتروني: ${donationForm.donorEmail}`;
+    }
+    if (donationForm.donorPhone) {
+      message += `\nالهاتف: ${donationForm.donorPhone}`;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, "_blank");
+    toast.success("تم فتح الواتساب - شكراً لتبرعك الكريم!");
+    
     setDonationForm({
       donorName: "",
       donorEmail: "",
@@ -202,17 +216,40 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">مشاريعنا الخيرية</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROJECTS.map((project) => (
-              <Card key={project.id} className="bg-slate-700 border-slate-600 hover:border-emerald-500 transition">
+            {PROJECTS_DATA.map((project: any) => (
+              <Card 
+                key={project.id} 
+                className={`border-slate-600 hover:border-emerald-500 transition ${
+                  project.isSpecial 
+                    ? "bg-gradient-to-br from-emerald-900 to-slate-700 border-emerald-500" 
+                    : "bg-slate-700"
+                }`}
+              >
                 <CardHeader>
-                  <CardTitle className="text-emerald-400">{project.name}</CardTitle>
-                  <CardDescription className="text-slate-400">{project.description}</CardDescription>
+                  <CardTitle className={project.isSpecial ? "text-emerald-300" : "text-emerald-400"}>
+                    {project.name}
+                  </CardTitle>
+                  <CardDescription className={project.isSpecial ? "text-emerald-200" : "text-slate-400"}>
+                    {project.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-slate-300 mb-4">{project.details}</p>
-                  <div className="text-sm text-emerald-400">
-                    الهدف: {project.goal}
+                  <div className={`text-sm font-semibold ${project.isSpecial ? "text-emerald-300" : "text-emerald-400"}`}>
+                    {project.goal}
                   </div>
+                  {project.isSpecial && (
+                    <div className="mt-4 p-3 bg-emerald-900/50 rounded text-emerald-200 text-sm">
+                      <p className="mb-2">🤍 شارك في الخير الدائم:</p>
+                      <ul className="space-y-1 text-xs">
+                        <li>⛔ صدقة جارية في بناء مسجد</li>
+                        <li>⛔ مركز طبي لعلاج المرضى</li>
+                        <li>⛔ مؤسسة خيرية وتجهيز العرائس</li>
+                        <li>⛔ مشغل للنساء الأرامل والمطلقات</li>
+                        <li>⛔ مكان تعليم علوم شرعية</li>
+                      </ul>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -220,8 +257,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Achievements Gallery Section */}
+      <section className="py-20 px-4 bg-slate-800/50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">إنجازاتنا من الواقع</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div 
+                key={item}
+                className="bg-slate-700 rounded-lg overflow-hidden hover:shadow-lg transition transform hover:scale-105"
+              >
+                <div className="w-full h-48 bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+                  <div className="text-center">
+                    <Gift className="w-16 h-16 mx-auto mb-2 text-white opacity-50" />
+                    <p className="text-white text-sm">صورة الإنجاز #{item}</p>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-emerald-400 font-semibold mb-2">إنجاز {item}</h3>
+                  <p className="text-slate-300 text-sm">قصة نجاح من مشاريعنا الخيرية</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-slate-400 mt-8 text-sm">
+            * سيتم إضافة صور الإنجازات الفعلية قريباً
+          </p>
+        </div>
+      </section>
+
       {/* Donation Section */}
-      <section id="donate-section" className="py-20 px-4 bg-slate-800/50">
+      <section id="donate-section" className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">تبرع الآن</h2>
           
@@ -270,7 +336,6 @@ export default function Home() {
               <option value="vodafone_cash">Vodafone Cash</option>
               <option value="etisalat_cash">Etisalat Cash</option>
               <option value="orange_cash">Orange Cash</option>
-              <option value="bank_transfer">تحويل بنكي</option>
             </select>
 
             <textarea
@@ -285,45 +350,38 @@ export default function Home() {
               type="submit" 
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
             >
-              تبرع الآن
+              <ExternalLink className="w-5 h-5 ml-2" />
+              تبرع عبر الواتساب
             </Button>
           </form>
 
           {/* Payment Methods */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-slate-700 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-emerald-400">المحافظ الإلكترونية</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Object.entries(DONATION_METHODS.wallets).map(([key, wallet]) => (
-                  <div key={key} className="text-slate-300">
-                    <p className="font-semibold">{wallet.name}</p>
-                    <p className="text-sm text-slate-400">{wallet.number}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-700 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-emerald-400">التحويل البنكي</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Object.entries(DONATION_METHODS.bankTransfer).map(([key, value]) => (
-                  <div key={key} className="text-slate-300">
-                    <p className="font-semibold text-sm">{key}</p>
-                    <p className="text-sm text-slate-400">{value}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+          <div className="bg-slate-700 p-6 rounded-lg">
+            <h3 className="text-emerald-400 font-bold mb-4">طرق الدفع المتاحة</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <p className="text-slate-300"><span className="font-semibold">InstaPay:</span> {DONATION_METHODS.instapay}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <p className="text-slate-300"><span className="font-semibold">Vodafone Cash:</span> {DONATION_METHODS.wallets.vodafone.number}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <p className="text-slate-300"><span className="font-semibold">Etisalat Cash:</span> {DONATION_METHODS.wallets.etisalat.number}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <p className="text-slate-300"><span className="font-semibold">Orange Cash:</span> {DONATION_METHODS.wallets.orange.number}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact-section" className="py-20 px-4">
+      <section id="contact-section" className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">تواصل معنا</h2>
           
@@ -335,18 +393,16 @@ export default function Home() {
                   الواتساب
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {DONATION_METHODS.whatsapp.map((number: string) => (
-                  <a 
-                    key={number}
-                    href={`https://wa.me/${number.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-emerald-400 hover:text-emerald-300 transition"
-                  >
-                    {number}
-                  </a>
-                ))}
+              <CardContent>
+                <a 
+                  href={`https://wa.me/${DONATION_METHODS.whatsapp.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2"
+                >
+                  {DONATION_METHODS.whatsapp}
+                  <ExternalLink className="w-4 h-4" />
+                </a>
               </CardContent>
             </Card>
 
@@ -362,9 +418,10 @@ export default function Home() {
                   href="https://t.me/mshro3nallgana"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-400 hover:text-emerald-300 transition"
+                  className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2"
                 >
                   قناة مشروعنا إلى الجنة
+                  <ExternalLink className="w-4 h-4" />
                 </a>
               </CardContent>
             </Card>
