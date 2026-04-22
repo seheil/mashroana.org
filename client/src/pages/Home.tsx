@@ -1,402 +1,293 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, Users, Gift, Phone, MessageCircle, ExternalLink, Zap, Leaf, Building2, Sprout } from "lucide-react";
-import { DONATION_METHODS, PROJECTS_DATA, STATISTICS } from "@shared/donation-config";
-import { useState } from "react";
-import { toast } from "sonner";
-import { GardenCanvas } from "@/components/GardenCanvas";
-import { HarvestDashboard } from "@/components/HarvestDashboard";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from 'react';
+import { Heart, Leaf, Droplets, Users, BookOpen, FileText, ChevronDown, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const projects = [
+  { id: 1, name: 'غرس النخيل', icon: Leaf, color: 'from-green-600 to-green-400', cta: 'اغرس نخلة', description: 'شارك في زراعة النخيل وساهم في تحسين البيئة' },
+  { id: 2, name: 'سقيا الماء', icon: Droplets, color: 'from-blue-600 to-blue-400', cta: 'اسقِ أسرة', description: 'ساعد الأسر المحتاجة بتوفير المياه النظيفة' },
+  { id: 3, name: 'كفالة الأيتام', icon: Users, color: 'from-purple-600 to-purple-400', cta: 'اكفل أسرة', description: 'كفل يتيماً وغيّر حياته للأفضل' },
+  { id: 4, name: 'الخدمات الطبية', icon: Heart, color: 'from-red-600 to-red-400', cta: 'اشفِ مريضاً', description: 'ساهم في علاج المرضى المحتاجين' },
+  { id: 5, name: 'المجمع الخيري', icon: BookOpen, color: 'from-amber-600 to-amber-400', cta: 'اشارك في السهم', description: 'استثمر في مشروع خيري شامل' },
+];
+
+const documents = [
+  { title: 'الميادين الـ 14', description: 'مجالات عمل المؤسسة الشاملة' },
+  { title: 'التفاصيل الرسمية', description: 'معلومات التسجيل والترخيص' },
+  { title: 'التقارير السنوية', description: 'تقارير الإنجازات والأثر الاجتماعي' },
+];
 
 export default function Home() {
-  const [donationForm, setDonationForm] = useState({
-    donorName: "",
-    donorEmail: "",
-    donorPhone: "",
-    amount: "",
-    message: "",
-  });
-  const [showHarvest, setShowHarvest] = useState(false);
+  const [donations, setDonations] = useState(0);
+  const [trees, setTrees] = useState(0);
+  const gardenRef = useRef<HTMLDivElement>(null);
 
-  const handleDonationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!donationForm.amount || parseFloat(donationForm.amount) <= 0) {
-      toast.error("الرجاء إدخال مبلغ صحيح");
-      return;
-    }
-
-    // فتح InstaPay مباشرة
-    window.open(DONATION_METHODS.instapay_link, "_blank");
-    toast.success("تم فتح InstaPay - شكراً لتبرعك الكريم!");
-    
-    setDonationForm({
-      donorName: "",
-      donorEmail: "",
-      donorPhone: "",
-      amount: "",
-      message: "",
-    });
-  };
-
-  const getProjectIcon = (iconName: string) => {
-    const icons: Record<string, React.ReactNode> = {
-      Heart: <Heart className="w-6 h-6" />,
-      Gift: <Gift className="w-6 h-6" />,
-      Users: <Users className="w-6 h-6" />,
-      Building2: <Building2 className="w-6 h-6" />,
-      Leaf: <Leaf className="w-6 h-6" />,
-    };
-    return icons[iconName] || <Heart className="w-6 h-6" />;
+  const scrollToGarden = () => {
+    gardenRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white" dir="rtl">
-      {/* Sticky Donate Button */}
-      <div className="fixed bottom-8 left-8 z-40 flex flex-col gap-3">
-        <Button 
-          size="lg" 
-          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg"
-          onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
-        >
-          <Heart className="w-5 h-5 ml-2" />
-          تبرع الآن
-        </Button>
-        <Button 
-          size="lg" 
-          className="bg-teal-500 hover:bg-teal-600 text-white rounded-full shadow-lg"
-          onClick={() => setShowHarvest(true)}
-        >
-          <Sprout className="w-5 h-5 ml-2" />
-          حصادك
-        </Button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-white via-green-50 to-blue-50">
+      {/* Floating Action Button */}
+      <motion.button
+        onClick={scrollToGarden}
+        className="fixed bottom-8 right-8 bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl z-40 flex items-center gap-2"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <Leaf size={20} />
+        <span>ازرع شجرة الآن</span>
+      </motion.button>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="text-center max-w-4xl">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 text-emerald-400">
-            مؤسسة مشروعنا إلى الجنة
-          </h1>
-          <h2 className="text-3xl md:text-4xl font-semibold mb-8 text-emerald-300">
-            للأعمال الخيرية
-          </h2>
-          <p className="text-2xl md:text-3xl mb-12 text-emerald-200 font-light">
-            خطوتك نحو الجنة تبدأ من هنا
-          </p>
-          <p className="text-lg md:text-xl mb-12 text-slate-300 leading-relaxed">
-            نعمل على نشر الخير والعطف في المجتمع من خلال مشاريع خيرية متنوعة تهدف إلى تحسين حياة المحتاجين والمستضعفين
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button 
-              size="lg"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white"
-              onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
-            >
-              <Heart className="w-5 h-5 ml-2" />
-              تبرع الآن
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="border-emerald-400 text-emerald-400 hover:bg-emerald-400/10"
-              onClick={() => document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              <MessageCircle className="w-5 h-5 ml-2" />
-              تواصل معنا
-            </Button>
+      <section className="pt-20 pb-16 px-4 text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-5xl font-bold text-green-700 mb-4"
+        >
+          مؤسسة مشروعنا إلى الجنة
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-2xl text-green-600 mb-6"
+        >
+          خطوتك نحو الجنة تبدأ من هنا
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-gray-700 max-w-2xl mx-auto mb-8"
+        >
+          نعمل على نشر الخير والعطف في المجتمع من خلال مشاريع خيرية متنوعة تهدف إلى تحسين حياة المحتاجين والمستضعفين
+        </motion.p>
+        <motion.button
+          onClick={scrollToGarden}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-gradient-to-r from-green-600 to-green-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow"
+        >
+          تبرع الآن
+        </motion.button>
+      </section>
+
+      {/* Interactive Garden Section */}
+      <section ref={gardenRef} className="py-20 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">بستاننا الرقمي الحي</h2>
+          
+          {/* Garden Canvas */}
+          <div className="bg-gradient-to-b from-blue-100 to-green-100 rounded-2xl p-8 mb-8 min-h-96 flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute text-6xl"
+                  initial={{ x: Math.random() * 300, y: Math.random() * 300 }}
+                  animate={{ y: [0, -20, 0] }}
+                  transition={{ duration: 4, delay: i * 0.2, repeat: Infinity }}
+                  style={{ left: `${20 + i * 15}%`, top: `${30 + i * 10}%` }}
+                >
+                  🌴
+                </motion.div>
+              ))}
+            </div>
+            
+            <div className="text-center z-10">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-8xl mb-4"
+              >
+                🌳
+              </motion.div>
+              <p className="text-2xl font-bold text-green-700">
+                {trees} نخلة مزروعة
+              </p>
+              <p className="text-gray-600 mt-2">
+                شكراً لمساهمتك في تخضير المجتمع
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Garden Canvas Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-slate-800/50 to-slate-900/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-8 text-center text-emerald-400">🌳 بستاننا الرقمي الحي</h2>
-          <p className="text-center text-slate-300 mb-12 max-w-2xl mx-auto">
-            كل تبرع يضيف عنصراً جديداً إلى بستاننا - نخلة جديدة، بئر ماء، أو زهرة أمل
-          </p>
-          <GardenCanvas />
-        </div>
-      </section>
-
-      {/* Statistics Section */}
-      <section className="py-20 px-4 bg-slate-800/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">إحصائياتنا</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-400">
-                  <Users className="w-6 h-6" />
-                  الأيتام المكفولون
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-2">
-                  {STATISTICS.orphans.current}
-                </div>
-                <div className="w-full bg-slate-600 rounded-full h-2">
-                  <div 
-                    className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATISTICS.orphans.current / STATISTICS.orphans.target) * 100}%` }}
-                  />
-                </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.orphans.target}</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-400">
-                  <Heart className="w-6 h-6" />
-                  الأسر المساعدة
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-2">
-                  {STATISTICS.families.current}
-                </div>
-                <div className="w-full bg-slate-600 rounded-full h-2">
-                  <div 
-                    className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATISTICS.families.current / STATISTICS.families.target) * 100}%` }}
-                  />
-                </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.families.target}</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-400">
-                  <Gift className="w-6 h-6" />
-                  المستفيدون
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-2">
-                  {STATISTICS.totalBeneficiaries.current}
-                </div>
-                <div className="w-full bg-slate-600 rounded-full h-2">
-                  <div 
-                    className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATISTICS.totalBeneficiaries.current / STATISTICS.totalBeneficiaries.target) * 100}%` }}
-                  />
-                </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.totalBeneficiaries.target}</p>
-              </CardContent>
-            </Card>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            <motion.div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
+              <p className="text-3xl font-bold text-green-700">{donations.toLocaleString()}</p>
+              <p className="text-gray-600">جنيه تم التبرع به</p>
+            </motion.div>
+            <motion.div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
+              <p className="text-3xl font-bold text-blue-700">{trees}</p>
+              <p className="text-gray-600">نخلة مزروعة</p>
+            </motion.div>
+            <motion.div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
+              <p className="text-3xl font-bold text-amber-700">500,000</p>
+              <p className="text-gray-600">من 2,000,000 جنيه</p>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Projects Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">مشاريعنا الخيرية</h2>
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">مشاريعنا الخيرية</h2>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROJECTS_DATA.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className={`bg-gradient-to-br ${project.isSpecial ? 'from-amber-600 to-orange-700' : 'from-slate-700 to-slate-800'} border-emerald-500/30 hover:border-emerald-500/60 transition h-full flex flex-col`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="text-4xl">{getProjectIcon(project.icon || 'Heart')}</div>
-                    </div>
-                    <CardTitle className="text-xl text-white">{project.name}</CardTitle>
-                    <CardDescription className="text-emerald-200">{project.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <p className="text-slate-300 mb-4 flex-1">{project.details}</p>
-                    
-                    {project.hasProgressBar && (
-                      <div className="mb-4">
-                        <div className="w-full bg-slate-600 rounded-full h-2 mb-2">
-                          <div 
-                            className="bg-emerald-400 h-2 rounded-full" 
-                            style={{ width: `${(project.current! / project.target!) * 100}%` }}
-                          />
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          {project.current?.toLocaleString()} / {project.target?.toLocaleString()} جنيه
-                        </p>
-                      </div>
-                    )}
-                    
-                    <p className="text-sm font-semibold text-emerald-300 mb-4">{project.goal}</p>
-                    
-                    <Button 
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                      onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
-                    >
-                      <Heart className="w-4 h-4 ml-2" />
-                      تبرع الآن
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {projects.map((project) => {
+              const Icon = project.icon;
+              return (
+                <motion.div
+                  key={project.id}
+                  whileHover={{ y: -10 }}
+                  className={`bg-gradient-to-br ${project.color} text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow`}
+                >
+                  <Icon size={40} className="mb-4" />
+                  <h3 className="text-2xl font-bold mb-2">{project.name}</h3>
+                  <p className="mb-6 opacity-90">{project.description}</p>
+                  <button className="w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    {project.cta}
+                  </button>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <section className="py-20 px-4 bg-slate-800/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">📸 إنجازاتنا من الواقع</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+      {/* Official Documents Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">وثائقنا الرسمية</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {documents.map((doc, idx) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
+                key={idx}
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors cursor-pointer"
               >
-                <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 overflow-hidden hover:border-emerald-500/60 transition">
-                  <div className="w-full h-48 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
-                    <span className="text-6xl">🎯</span>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-bold text-emerald-400 mb-2">إنجاز {i}</h3>
-                    <p className="text-slate-300 text-sm">قصة نجاح من مشاريعنا الخيرية</p>
-                    <p className="text-xs text-slate-400 mt-2">* سيتم إضافة الصور الفعلية قريباً</p>
-                  </CardContent>
-                </Card>
+                <FileText className="text-green-600 mb-3" size={32} />
+                <h3 className="font-bold text-gray-800 mb-2">{doc.title}</h3>
+                <p className="text-gray-600 text-sm">{doc.description}</p>
               </motion.div>
             ))}
+          </div>
+
+          {/* 14 Fields Display */}
+          <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-8">
+            <h3 className="text-2xl font-bold text-green-700 mb-6">الأربعة عشر ميدان لعملنا</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                'المساعدات الاجتماعية',
+                'الأنشطة الصحية',
+                'رعاية الطفولة',
+                'الخدمات الثقافية والتعليمية',
+                'رعاية الأسرة',
+                'رعاية الفئات الخاصة',
+                'التنمية الاقتصادية',
+                'حماية البيئة',
+                'الصداقة بين الشعوب',
+                'النشاط الأدبي',
+                'التنظيم والإدارة',
+                'تنظيم الأسرة',
+                'رعاية الشيخوخة',
+                'أصحاب المعاشات'
+              ].map((field, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-white rounded-lg p-3 text-center font-semibold text-green-700 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {idx + 1}. {field}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Donation Form Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">تبرع الآن</h2>
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">نموذج التبرع</h2>
           
-          {/* Payment Methods */}
-          <div className="mb-12">
-            <h3 className="text-xl font-bold text-emerald-300 mb-6">طرق الدفع المتاحة</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0 cursor-pointer hover:shadow-lg transition">
-                <CardContent className="p-6">
-                  <div className="text-3xl mb-2">📱</div>
-                  <h4 className="text-white font-bold mb-2">InstaPay</h4>
-                  <p className="text-blue-100 text-sm mb-4">تحويل فوري وآمن</p>
-                  <Button 
-                    className="w-full bg-white text-blue-600 hover:bg-blue-50"
-                    onClick={() => window.open(DONATION_METHODS.instapay_link, "_blank")}
-                  >
-                    تبرع عبر InstaPay
-                  </Button>
-                </CardContent>
-              </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-lg p-8"
+          >
+            <form className="space-y-6">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">المبلغ (بالجنيه)</label>
+                <input
+                  type="number"
+                  placeholder="أدخل المبلغ"
+                  onChange={(e) => setDonations(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
+                />
+              </div>
 
-              <Card className="bg-gradient-to-br from-green-600 to-green-700 border-0 cursor-pointer hover:shadow-lg transition">
-                <CardContent className="p-6">
-                  <div className="text-3xl mb-2">💰</div>
-                  <h4 className="text-white font-bold mb-2">فودافون كاش</h4>
-                  <p className="text-green-100 text-sm mb-4">{DONATION_METHODS.vodafone_cash}</p>
-                  <Button 
-                    className="w-full bg-white text-green-600 hover:bg-green-50"
-                    onClick={() => {
-                      toast.success(`رقم فودافون كاش: ${DONATION_METHODS.vodafone_cash}`);
-                      navigator.clipboard.writeText(DONATION_METHODS.vodafone_cash);
-                    }}
-                  >
-                    نسخ الرقم
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">اسمك (اختياري)</label>
+                <input
+                  type="text"
+                  placeholder="أدخل اسمك"
+                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
+                />
+              </div>
 
-          {/* Donation Form */}
-          <form onSubmit={handleDonationSubmit} className="bg-slate-800/50 rounded-lg p-6 border border-emerald-500/30">
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="اسمك (اختياري)"
-                value={donationForm.donorName}
-                onChange={(e) => setDonationForm({...donationForm, donorName: e.target.value})}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <input
-                type="email"
-                placeholder="بريدك الإلكتروني (اختياري)"
-                value={donationForm.donorEmail}
-                onChange={(e) => setDonationForm({...donationForm, donorEmail: e.target.value})}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <input
-                type="tel"
-                placeholder="رقم الهاتف (اختياري)"
-                value={donationForm.donorPhone}
-                onChange={(e) => setDonationForm({...donationForm, donorPhone: e.target.value})}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <input
-                type="number"
-                placeholder="المبلغ (بالجنيه)"
-                value={donationForm.amount}
-                onChange={(e) => setDonationForm({...donationForm, amount: e.target.value})}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <textarea
-                placeholder="رسالة (اختيارية)"
-                value={donationForm.message}
-                onChange={(e) => setDonationForm({...donationForm, message: e.target.value})}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-24"
-              />
-              <Button 
-                type="submit"
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3"
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">بريدك الإلكتروني (اختياري)</label>
+                <input
+                  type="email"
+                  placeholder="أدخل بريدك"
+                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
+                />
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => setTrees(trees + 1)}
+                className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow"
               >
-                <Heart className="w-5 h-5 ml-2" />
                 تبرع عبر InstaPay
-              </Button>
-            </div>
-          </form>
+              </motion.button>
+            </form>
+          </motion.div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact-section" className="py-20 px-4 bg-slate-800/50">
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-12 text-emerald-400">تواصل معنا</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a
-              href={`https://wa.me/${DONATION_METHODS.whatsapp.replace(/^0/, '20')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gradient-to-br from-green-600 to-green-700 p-8 rounded-lg hover:shadow-lg transition"
+          <h2 className="text-4xl font-bold text-green-700 mb-12">تواصل معنا</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              href="https://wa.me/201013128453"
+              className="bg-gradient-to-r from-green-600 to-green-500 text-white p-6 rounded-lg font-semibold hover:shadow-lg transition-shadow"
             >
-              <MessageCircle className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">الواتساب</h3>
-              <p className="text-green-100">{DONATION_METHODS.whatsapp}</p>
-            </a>
-            <a
+              <MessageCircle size={32} className="mx-auto mb-3" />
+              واتساب: 01013128453
+            </motion.a>
+
+            <motion.a
+              whileHover={{ scale: 1.05 }}
               href="https://t.me/mshro3nallgana"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 rounded-lg hover:shadow-lg transition"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-6 rounded-lg font-semibold hover:shadow-lg transition-shadow"
             >
-              <ExternalLink className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">التيليجرام</h3>
-              <p className="text-blue-100">قناة مشروعنا إلى الجنة</p>
-            </a>
+              <MessageCircle size={32} className="mx-auto mb-3" />
+              قناة التيليجرام
+            </motion.a>
           </div>
         </div>
       </section>
-
-      {/* Harvest Dashboard Modal */}
-      <HarvestDashboard isOpen={showHarvest} onClose={() => setShowHarvest(false)} />
     </div>
   );
 }
