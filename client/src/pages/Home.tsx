@@ -90,33 +90,12 @@ export default function Home() {
       <section className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center text-emerald-400">إحصائياتنا</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-400">
-                  <BookOpen className="w-6 h-6" />
-                  الطالبات
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-2">
-                  {STATISTICS.students.current}
-                </div>
-                <div className="w-full bg-slate-600 rounded-full h-2">
-                  <div 
-                    className="bg-emerald-500 h-2 rounded-full" 
-                    style={{ width: `${(STATISTICS.students.current / STATISTICS.students.target) * 100}%` }}
-                  />
-                </div>
-                <p className="text-slate-400 text-sm mt-2">من {STATISTICS.students.target}</p>
-              </CardContent>
-            </Card>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="bg-gradient-to-br from-slate-700 to-slate-800 border-emerald-500/30 hover:border-emerald-500/60 transition">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Users className="w-6 h-6" />
-                  الأيتام
+                  الأيتام المكفولون
                 </CardTitle>
               </CardHeader>
               <CardContent>
