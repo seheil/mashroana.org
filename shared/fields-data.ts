@@ -101,7 +101,56 @@ export const ORGANIZATION_FIELDS = [
   },
 ];
 
-// معلومات إضافية عن كل ميدان للمستشار الذكي
+// حساب الأثر الذكي
+export function calculateSmartAllocation(amount: number) {
+  const allocations = [
+    { field: 'Palm Tree Planting', arabicField: 'زراعة النخيل', percentage: 30, amount: 0, impact: '' },
+    { field: 'Health', arabicField: 'الخدمات الصحية', percentage: 25, amount: 0, impact: '' },
+    { field: 'Social Aid', arabicField: 'المساعدات الاجتماعية', percentage: 25, amount: 0, impact: '' },
+    { field: 'Education', arabicField: 'التعليم والثقافة', percentage: 20, amount: 0, impact: '' },
+  ];
+
+  allocations.forEach((alloc) => {
+    alloc.amount = Math.round((amount * alloc.percentage) / 100);
+    if (alloc.arabicField === 'زراعة النخيل') {
+      alloc.impact = `${Math.round(alloc.amount / 1000)} سهم نخلة`;
+    } else if (alloc.arabicField === 'الخدمات الصحية') {
+      alloc.impact = `علاج ${Math.round(alloc.amount / 200)} مريض`;
+    } else if (alloc.arabicField === 'المساعدات الاجتماعية') {
+      alloc.impact = `مساعدة ${Math.round(alloc.amount / 500)} أسرة`;
+    } else {
+      alloc.impact = `دعم ${Math.round(alloc.amount / 100)} طالب`;
+    }
+  });
+
+  return allocations;
+}
+
+// رسالة الأثر الذكية
+export function generateImpactMessage(amount: number, projectName: string): string {
+  const allocations = calculateSmartAllocation(amount);
+
+  let message = `🌱 شكراً لك على تبرعك بمبلغ ${amount} جنيه\n\n`;
+  message += `هذا التبرع سيساهم في:\n\n`;
+
+  allocations.forEach((alloc) => {
+    message += `✅ ${alloc.arabicField}: ${alloc.amount} جنيه (${alloc.impact})\n`;
+  });
+
+  message += `\n🌳 أنت الآن شريك في بناء مستقبل أفضل لمصر!`;
+
+  return message;
+}
+
+// قائمة الأسئلة الاستباقية
+export const proactiveQuestions = [
+  'هل تريد معرفة أين سيذهب تبرعك بالضبط؟',
+  'هل تريد ملخص أثرك اليوم؟',
+  'هل تريد اقتراح مشروع يناسب ميزانيتك؟',
+  'هل تريد معرفة المزيد عن أحد مشاريعنا؟',
+];
+
+// معلومات إضافية عن كل ميدان
 export const FIELD_DETAILS: Record<number, { fullDescription: string; examples: string[]; suggestedDonations: number[] }> = {
   1: {
     fullDescription: "تقديم المساعدات الاجتماعية المتنوعة للأسر المحتاجة والفئات الضعيفة من خلال برامج منظمة ومستهدفة",
@@ -145,7 +194,7 @@ export const FIELD_DETAILS: Record<number, { fullDescription: string; examples: 
   },
   9: {
     fullDescription: "بناء جسور التعاون والصداقة بين الشعوب والدول وتعزيز التسامح",
-    examples: ["برامج التبادل الثقافي والحوار الحضاري", "مشاريع إنسانية دولية", "الإغاثة الدولية والمساعدات الطارئة"],
+    examples: ["برامج التبادل الثقافي والحوار الحضاري", "مشاريع إنسانية محلية", "تعزيز الصداقة بين المجتمعات المصرية"],
     suggestedDonations: [500, 1000, 2000, 5000],
   },
   10: {

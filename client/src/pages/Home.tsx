@@ -1,13 +1,55 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Heart, Leaf, Droplets, Users, BookOpen, FileText, ChevronDown, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import DonationModal from '@/components/DonationModal';
+import { ORGANIZATION_FIELDS } from '@shared/fields-data';
 
 const projects = [
-  { id: 1, name: 'غرس النخيل', icon: Leaf, color: 'from-green-600 to-green-400', cta: 'اغرس نخلة', description: 'شارك في زراعة النخيل وساهم في تحسين البيئة' },
-  { id: 2, name: 'سقيا الماء', icon: Droplets, color: 'from-blue-600 to-blue-400', cta: 'اسقِ أسرة', description: 'ساعد الأسر المحتاجة بتوفير المياه النظيفة' },
-  { id: 3, name: 'كفالة الأيتام', icon: Users, color: 'from-purple-600 to-purple-400', cta: 'اكفل أسرة', description: 'كفل يتيماً وغيّر حياته للأفضل' },
-  { id: 4, name: 'الخدمات الطبية', icon: Heart, color: 'from-red-600 to-red-400', cta: 'اشفِ مريضاً', description: 'ساهم في علاج المرضى المحتاجين' },
-  { id: 5, name: 'المجمع الخيري', icon: BookOpen, color: 'from-amber-600 to-amber-400', cta: 'اشارك في السهم', description: 'استثمر في مشروع خيري شامل' },
+  { 
+    id: 1, 
+    name: 'غرس النخيل', 
+    arabicName: 'غرس النخيل',
+    icon: '🌴', 
+    color: 'from-green-600 to-green-400', 
+    cta: 'اغرس نخلة', 
+    description: 'شارك في زراعة النخيل وساهم في تحسين البيئة' 
+  },
+  { 
+    id: 2, 
+    name: 'سقيا الماء', 
+    arabicName: 'سقيا الماء',
+    icon: '💧', 
+    color: 'from-blue-600 to-blue-400', 
+    cta: 'اسقِ أسرة', 
+    description: 'ساعد الأسر المحتاجة بتوفير المياه النظيفة' 
+  },
+  { 
+    id: 3, 
+    name: 'كفالة الأيتام', 
+    arabicName: 'كفالة الأيتام',
+    icon: '👨‍👧‍👦', 
+    color: 'from-purple-600 to-purple-400', 
+    cta: 'اكفل أسرة', 
+    description: 'كفل يتيماً وغيّر حياته للأفضل' 
+  },
+  { 
+    id: 4, 
+    name: 'الخدمات الطبية', 
+    arabicName: 'الخدمات الطبية',
+    icon: '⚕️', 
+    color: 'from-red-600 to-red-400', 
+    cta: 'اشفِ مريضاً', 
+    description: 'ساهم في علاج المرضى المحتاجين' 
+  },
+  { 
+    id: 5, 
+    name: 'المجمع الخيري', 
+    arabicName: 'المجمع الخيري',
+    icon: '🏛️', 
+    color: 'from-amber-600 to-amber-400', 
+    cta: 'اشارك في السهم', 
+    description: 'استثمر في مشروع خيري شامل' 
+  },
 ];
 
 const documents = [
@@ -19,18 +61,25 @@ const documents = [
 export default function Home() {
   const [donations, setDonations] = useState(0);
   const [trees, setTrees] = useState(0);
+  const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const gardenRef = useRef<HTMLDivElement>(null);
 
   const scrollToGarden = () => {
     gardenRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openDonationModal = (project: typeof projects[0]) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-green-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-b from-white via-green-50 to-blue-50" dir="rtl">
       {/* Floating Action Button */}
       <motion.button
         onClick={scrollToGarden}
-        className="fixed bottom-8 right-8 bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl z-40 flex items-center gap-2"
+        className="fixed bottom-8 left-8 bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl z-40 flex items-center gap-2"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -73,8 +122,39 @@ export default function Home() {
         </motion.button>
       </section>
 
+      {/* Projects Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">مشاريعنا الخيرية</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project, idx) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6 border border-gray-200"
+              >
+                <div className="text-5xl mb-4">{project.icon}</div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">{project.name}</h3>
+                <p className="text-gray-600 mb-6">{project.description}</p>
+                <motion.button
+                  onClick={() => openDonationModal(project)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow"
+                >
+                  {project.cta}
+                </motion.button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Interactive Garden Section */}
-      <section ref={gardenRef} className="py-20 px-4 bg-white">
+      <section ref={gardenRef} className="py-20 px-4 bg-gradient-to-b from-green-50 to-blue-50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-green-700 mb-12">بستاننا الرقمي الحي</h2>
           
@@ -99,77 +179,61 @@ export default function Home() {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="text-8xl mb-4"
+                transition={{ type: 'spring', stiffness: 100 }}
+                className="text-7xl mb-6"
               >
                 🌳
               </motion.div>
-              <p className="text-2xl font-bold text-green-700">
-                {trees} نخلة مزروعة
-              </p>
-              <p className="text-gray-600 mt-2">
-                شكراً لمساهمتك في تخضير المجتمع
-              </p>
+              <h3 className="text-3xl font-bold text-green-700 mb-2">عدد الأشجار المزروعة</h3>
+              <motion.p
+                key={trees}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-5xl font-bold text-green-600"
+              >
+                {trees}
+              </motion.p>
+              <p className="text-gray-600 mt-4">كل تبرع يضيف شجرة جديدة إلى بستاننا</p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <motion.div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
-              <p className="text-3xl font-bold text-green-700">{donations.toLocaleString()}</p>
-              <p className="text-gray-600">جنيه تم التبرع به</p>
-            </motion.div>
-            <motion.div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
-              <p className="text-3xl font-bold text-blue-700">{trees}</p>
-              <p className="text-gray-600">نخلة مزروعة</p>
-            </motion.div>
-            <motion.div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-lg text-center" whileHover={{ scale: 1.05 }}>
-              <p className="text-3xl font-bold text-amber-700">500,000</p>
-              <p className="text-gray-600">من 2,000,000 جنيه</p>
-            </motion.div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'الأيتام المكفولين', value: 1250 },
+              { label: 'الأسر المساعدة', value: 3400 },
+              { label: 'المرضى المعالجين', value: 5600 },
+              { label: 'الطلاب المدعومين', value: 2100 },
+            ].map((stat, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white rounded-lg p-4 text-center shadow-md"
+              >
+                <p className="text-2xl font-bold text-green-600">{stat.value}</p>
+                <p className="text-gray-600 text-sm">{stat.label}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">مشاريعنا الخيرية</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => {
-              const Icon = project.icon;
-              return (
-                <motion.div
-                  key={project.id}
-                  whileHover={{ y: -10 }}
-                  className={`bg-gradient-to-br ${project.color} text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow`}
-                >
-                  <Icon size={40} className="mb-4" />
-                  <h3 className="text-2xl font-bold mb-2">{project.name}</h3>
-                  <p className="mb-6 opacity-90">{project.description}</p>
-                  <button className="w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    {project.cta}
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Official Documents Section */}
+      {/* Trust & Transparency Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">وثائقنا الرسمية</h2>
+          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">الشفافية والثقة</h2>
           
+          {/* Documents */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {documents.map((doc, idx) => (
               <motion.div
                 key={idx}
                 whileHover={{ scale: 1.05 }}
-                className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors cursor-pointer"
+                className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-6 text-center shadow-md hover:shadow-lg border border-green-200 transition-all cursor-pointer"
               >
-                <FileText className="text-green-600 mb-3" size={32} />
+                <FileText className="text-green-600 mb-3 mx-auto" size={32} />
                 <h3 className="font-bold text-gray-800 mb-2">{doc.title}</h3>
                 <p className="text-gray-600 text-sm">{doc.description}</p>
               </motion.div>
@@ -180,28 +244,13 @@ export default function Home() {
           <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-8">
             <h3 className="text-2xl font-bold text-green-700 mb-6">الأربعة عشر ميدان لعملنا</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                'المساعدات الاجتماعية',
-                'الأنشطة الصحية',
-                'رعاية الطفولة',
-                'الخدمات الثقافية والتعليمية',
-                'رعاية الأسرة',
-                'رعاية الفئات الخاصة',
-                'التنمية الاقتصادية',
-                'حماية البيئة',
-                'الصداقة بين الشعوب',
-                'النشاط الأدبي',
-                'التنظيم والإدارة',
-                'تنظيم الأسرة',
-                'رعاية الشيخوخة',
-                'أصحاب المعاشات'
-              ].map((field, idx) => (
+              {ORGANIZATION_FIELDS.map((field, idx) => (
                 <motion.div
-                  key={idx}
+                  key={field.id}
                   whileHover={{ scale: 1.05 }}
                   className="bg-white rounded-lg p-3 text-center font-semibold text-green-700 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  {idx + 1}. {field}
+                  {idx + 1}. {field.name}
                 </motion.div>
               ))}
             </div>
@@ -209,61 +258,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Donation Form Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-green-700 mb-12">نموذج التبرع</h2>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-lg p-8"
-          >
-            <form className="space-y-6">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">المبلغ (بالجنيه)</label>
-                <input
-                  type="number"
-                  placeholder="أدخل المبلغ"
-                  onChange={(e) => setDonations(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">اسمك (اختياري)</label>
-                <input
-                  type="text"
-                  placeholder="أدخل اسمك"
-                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">بريدك الإلكتروني (اختياري)</label>
-                <input
-                  type="email"
-                  placeholder="أدخل بريدك"
-                  className="w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600"
-                />
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="button"
-                onClick={() => setTrees(trees + 1)}
-                className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-shadow"
-              >
-                تبرع عبر InstaPay
-              </motion.button>
-            </form>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Contact Section */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-green-700 mb-12">تواصل معنا</h2>
           
@@ -276,7 +272,6 @@ export default function Home() {
               <MessageCircle size={32} className="mx-auto mb-3" />
               واتساب: 01013128453
             </motion.a>
-
             <motion.a
               whileHover={{ scale: 1.05 }}
               href="https://t.me/mshro3nallgana"
@@ -288,6 +283,15 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Donation Modal */}
+      {selectedProject && (
+        <DonationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          project={selectedProject}
+        />
+      )}
     </div>
   );
 }
