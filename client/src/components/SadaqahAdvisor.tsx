@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Send, X, Minimize2, Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CHATBOT_SYSTEM_PROMPT, PROACTIVE_QUESTIONS, PROJECTS_FOR_CHATBOT } from "../../../shared/chatbot-knowledge";
 
 interface Message {
   id: string;
@@ -16,7 +17,7 @@ export function SadaqahAdvisor() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "السلام عليكم! 👋 أنا مستشارك الخيري. كيف يمكنني مساعدتك في اختيار الطريقة الأفضل للتبرع؟",
+      text: PROACTIVE_QUESTIONS[0],
       sender: "bot",
       timestamp: new Date(),
     },
@@ -49,13 +50,14 @@ export function SadaqahAdvisor() {
     setInput("");
     setIsLoading(true);
 
-    // محاكاة رد البوت
+    // محاكاة رد البوت باستخدام قاعدة معارف الـ Chatbot
     setTimeout(() => {
+      // ردود ذكية باستناد إلى قاعدة المعارف
       const botResponses = [
-        "شكراً لاهتمامك! 💚 يمكنك التبرع في أي من مجالاتنا الـ 14. هل تريد معرفة المزيد عن مجال معين؟",
-        "رائع! 🌟 أنصحك بالبدء بمبلغ صغير في المجال الذي تشعر به بقلبك أكثر.",
-        "كل تبرع له أثر عظيم! 🙏 هل تريد معرفة الفرق الذي ستحدثه مساهمتك؟",
-        "ممتاز! 🎯 يمكنك متابعة تأثير تبرعك من خلال لوحة 'حصادك' الخاصة بك.",
+        `🌟 رائع! لدينا ${PROJECTS_FOR_CHATBOT.length} مشروع خيري متنوع. هل تريد معرفة المزيد عن أحدها؟`,
+        "💚 شكراً لاهتمامك! كل تبرع له أثر عظيم على حياة الناس المحتاجين.",
+        "🎉 ممتاز! يمكنك التبرع بأي مبلغ مهما كان صغيراً. الأهم هو النية الطيبة! للهم الحمد.",
+        "🙏 شكراً على إهتمامك بمساعدة المحتاجين. هل تريد معرفة كيف يمكنك البدء؟",
       ];
 
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
@@ -69,7 +71,7 @@ export function SadaqahAdvisor() {
 
       setMessages((prev) => [...prev, botMessage]);
       setIsLoading(false);
-    }, 1000);
+    }, 800);
   };
 
   return (
