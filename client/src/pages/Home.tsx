@@ -3,6 +3,7 @@ import { Heart, Leaf, Droplets, Users, BookOpen, FileText, ChevronDown, MessageC
 import { motion } from 'framer-motion';
 import DonationModal from '@/components/DonationModal';
 import { ORGANIZATION_FIELDS } from '@shared/fields-data';
+import FacebookFeed from "@/components/FacebookFeed";
 
 const projects = [
   { 
@@ -257,6 +258,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <FacebookFeed />
 
       {/* Contact Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-green-50 to-white">
