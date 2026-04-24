@@ -39,7 +39,7 @@ const projects = [
     arabicName: 'الخدمات الطبية',
     icon: '⚕️', 
     color: 'from-red-600 to-red-400', 
-    cta: 'اشفِ مريضاً', 
+    cta: 'ساهم في تخفيف ألم مريض', 
     description: 'ساهم في علاج المرضى المحتاجين' 
   },
   { 
