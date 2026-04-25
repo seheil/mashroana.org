@@ -1,106 +1,46 @@
 import { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share2, ExternalLink, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { trpc } from '@/lib/trpc';
 
 interface FacebookPost {
   id: string;
   text: string;
-  image?: string;
+  timestamp: string;
+  link: string;
   likes: number;
   comments: number;
   shares: number;
-  timestamp: string;
-  link: string;
 }
 
-// بيانات افتراضية لآخر المنشورات
-const defaultPosts: FacebookPost[] = [
-  {
-    id: '1',
-    text: 'الحمد لله على نعمه! تم توزيع 150 شنطة غذائية على الأسر المحتاجة هذا الأسبوع. شكراً لكل من ساهم في هذا المشروع الخيري.',
-    image: '🎁',
-    likes: 324,
-    comments: 45,
-    shares: 28,
-    timestamp: new Date().toLocaleDateString('ar-EG'),
-    link: 'https://facebook.com/61582145746691/posts/123456'
-  },
-  {
-    id: '2',
-    text: 'مشروع غرس النخيل: تم زراعة 500 نخلة جديدة في محافظة الفيوم! 🌴 كل نخلة تمثل أمل وحياة جديدة. شارك معنا في هذا المشروع الخيري.',
-    image: '🌴',
-    likes: 512,
-    comments: 78,
-    shares: 95,
-    timestamp: new Date(Date.now() - 86400000).toLocaleDateString('ar-EG'),
-    link: 'https://facebook.com/61582145746691/posts/123455'
-  },
-  {
-    id: '3',
-    text: 'عيادة طبية مجانية: قدمنا خدمات طبية لـ 200 مريض هذا الشهر. الفحوصات والأدوية والعلاجات كلها مجانية. 💊',
-    image: '⚕️',
-    likes: 287,
-    comments: 52,
-    shares: 41,
-    timestamp: new Date(Date.now() - 172800000).toLocaleDateString('ar-EG'),
-    link: 'https://facebook.com/61582145746691/posts/123454'
-  }
-];
-
 export default function FacebookFeed() {
-  const [posts, setPosts] = useState<FacebookPost[]>(defaultPosts);
+  const [posts, setPosts] = useState<FacebookPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // استخدام tRPC للحصول على منشورات Facebook
+  const { data, isLoading: isFetching, error: fetchError } = trpc.facebook.getPosts.useQuery();
+
   useEffect(() => {
-    const fetchFacebookPosts = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // محاولة جلب المنشورات من Facebook Graph API
-        const pageId = '61582145746691';
-        const accessToken = process.env.VITE_FACEBOOK_ACCESS_TOKEN;
-
-        if (accessToken) {
-          // إذا كان هناك access token، جرب جلب المنشورات الحقيقية
-          const response = await fetch(
-            `https://graph.facebook.com/v18.0/${pageId}/posts?fields=message,picture,likes.summary(true).limit(0),comments.summary(true).limit(0),shares&limit=3&access_token=${accessToken}`,
-            { mode: 'cors' }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.data && data.data.length > 0) {
-              const formattedPosts = data.data.map((post: any, index: number) => ({
-                id: post.id,
-                text: post.message || 'منشور بدون نص',
-                image: post.picture,
-                likes: post.likes?.summary?.total_count || 0,
-                comments: post.comments?.summary?.total_count || 0,
-                shares: post.shares?.count || 0,
-                timestamp: new Date(Date.now() - index * 86400000).toLocaleDateString('ar-EG'),
-                link: `https://facebook.com/${post.id}`
-              }));
-              setPosts(formattedPosts);
-              setIsLoading(false);
-              return;
-            }
-          }
-        }
-
-        // إذا فشل جلب البيانات الحقيقية، استخدم البيانات الافتراضية
-        setPosts(defaultPosts);
-        setIsLoading(false);
-      } catch (err) {
-        console.log('استخدام البيانات الافتراضية');
-        setPosts(defaultPosts);
-        setIsLoading(false);
+    if (data) {
+      setPosts(data.posts);
+      setIsLoading(false);
+      if (data.error) {
+        setError(data.error);
       }
-    };
+    }
+  }, [data]);
 
-    fetchFacebookPosts();
-  }, []);
+  useEffect(() => {
+    if (fetchError) {
+      setError('حدث خطأ في جلب المنشورات');
+      setIsLoading(false);
+    }
+  }, [fetchError]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   return (
     <section className="py-16 px-4 bg-gradient-to-b from-blue-50 to-white" dir="rtl">
@@ -139,13 +79,13 @@ export default function FacebookFeed() {
 
         {/* Error State */}
         {error && (
-          <div className="p-4 bg-red-100 border-l-4 border-red-600 text-red-700 rounded mb-6">
+          <div className="p-4 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-700 rounded mb-6">
             ⚠️ {error}
           </div>
         )}
 
         {/* Posts Grid */}
-        {!isLoading && (
+        {!isLoading && posts.length > 0 && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
             {posts.map((post, index) => (
               <motion.div
@@ -181,18 +121,6 @@ export default function FacebookFeed() {
 
                 {/* Post Content */}
                 <div className="p-6">
-                  {/* Image/Emoji */}
-                  {post.image && (
-                    <div className="text-6xl text-center mb-4 p-4 bg-gray-50 rounded-lg">
-                      {post.image.startsWith('http') ? (
-                        <img src={post.image} alt="post" className="w-full h-48 object-cover rounded" />
-                      ) : (
-                        post.image
-                      )}
-                    </div>
-                  )}
-
-                  {/* Text */}
                   <p className="text-gray-700 leading-relaxed mb-4 text-lg">
                     {post.text}
                   </p>
@@ -224,6 +152,13 @@ export default function FacebookFeed() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {/* No Posts State */}
+        {!isLoading && posts.length === 0 && !error && (
+          <div className="text-center py-12 text-gray-600">
+            <p className="text-lg">لا توجد منشورات متاحة حالياً</p>
           </div>
         )}
 
