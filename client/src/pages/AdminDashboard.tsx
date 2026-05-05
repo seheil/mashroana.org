@@ -171,11 +171,16 @@ export default function AdminDashboard() {
         {activeTab === "gallery" && (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">إدارة المعرض</h2>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <p className="text-gray-600 mb-4">اسحب الصور هنا أو انقر للاختيار</p>
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                اختر الصور
-              </Button>
+            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+              <p className="text-blue-800">
+                <strong>ملاحظة:</strong> يمكنك إضافة الصور يدويًا إلى مجلد public/images وسيتم عرضها تلقائيًا في المعرض.
+              </p>
+            </div>
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📁</div>
+              <p className="text-gray-600 text-lg">
+                سيتم إضافة خاصية رفع الصور قريبًا
+              </p>
             </div>
           </div>
         )}

@@ -1,0 +1,88 @@
+/**
+ * Gallery Images Data
+ * Static image paths for the gallery
+ */
+
+export const galleryImages = [
+  {
+    id: 1,
+    title: "كفالة الأيتام",
+    titleEn: "Orphan Care",
+    description: "توفير الرعاية والتعليم والدعم النفسي للأيتام",
+    descriptionEn: "Providing care, education and psychological support for orphans",
+    image: "/images/orphans.jpg",
+    category: "social",
+  },
+  {
+    id: 2,
+    title: "الدعم التعليمي",
+    titleEn: "Educational Support",
+    description: "توفير المنح الدراسية والكتب والأدوات المدرسية",
+    descriptionEn: "Providing scholarships, books and school supplies",
+    image: "/images/education.jpg",
+    category: "education",
+  },
+  {
+    id: 3,
+    title: "التمكين الاقتصادي",
+    titleEn: "Economic Empowerment",
+    description: "دعم المشاريع الصغيرة والمتوسطة والتدريب المهني",
+    descriptionEn: "Supporting small and medium enterprises and vocational training",
+    image: "/images/economic.jpg",
+    category: "economic",
+  },
+  {
+    id: 4,
+    title: "زراعة النخيل",
+    titleEn: "Palm Tree Planting",
+    description: "مشروع زراعة النخيل والأشجار المثمرة",
+    descriptionEn: "Palm tree and fruit tree planting project",
+    image: "/images/agriculture.jpg",
+    category: "environment",
+  },
+  {
+    id: 5,
+    title: "الخدمات الصحية",
+    titleEn: "Healthcare Services",
+    description: "توفير الخدمات الطبية والعلاجية والأدوية",
+    descriptionEn: "Providing medical services, treatment and medicines",
+    image: "/images/health.jpg",
+    category: "health",
+  },
+  {
+    id: 6,
+    title: "الإغاثة الاجتماعية",
+    titleEn: "Social Relief",
+    description: "تقديم المساعدات الاجتماعية للأسر المحتاجة",
+    descriptionEn: "Providing social assistance to needy families",
+    image: "/images/relief.jpg",
+    category: "social",
+  },
+  {
+    id: 7,
+    title: "الأمومة والطفولة",
+    titleEn: "Motherhood & Childhood",
+    description: "رعاية الأمهات والأطفال والتوعية الصحية",
+    descriptionEn: "Care for mothers and children with health awareness",
+    image: "/images/motherhood.jpg",
+    category: "health",
+  },
+  {
+    id: 8,
+    title: "رعاية المسنين",
+    titleEn: "Elderly Care",
+    description: "توفير الرعاية الصحية والاجتماعية للمسنين",
+    descriptionEn: "Providing healthcare and social care for the elderly",
+    image: "/images/elderly.jpg",
+    category: "social",
+  },
+  {
+    id: 9,
+    title: "ذوي الاحتياجات الخاصة",
+    titleEn: "Special Needs",
+    description: "دعم وتأهيل الأشخاص ذوي الاحتياجات الخاصة",
+    descriptionEn: "Support and rehabilitation for people with special needs",
+    image: "/images/special-needs.jpg",
+    category: "social",
+  },
+];
