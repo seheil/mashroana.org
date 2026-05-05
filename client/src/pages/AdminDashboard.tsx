@@ -1,37 +1,108 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { signOut } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function AdminDashboard() {
+  const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [counters, setCounters] = useState({
-    orphans: 150,
-    students: 200,
-    patients: 300,
-    families: 100,
+    orphans: 0,
+    students: 0,
+    patients: 0,
+    families: 0,
   });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    setLocation("/");
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation("/admin-login");
+    }
+  }, [user, loading, setLocation]);
+
+  // Load counters from Firestore
+  useEffect(() => {
+    if (user) {
+      loadCounters();
+    }
+  }, [user]);
+
+  const loadCounters = async () => {
+    try {
+      const docRef = doc(db, "settings", "counters");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCounters({
+          orphans: data.orphans || 0,
+          students: data.students || 0,
+          patients: data.patients || 0,
+          families: data.families || 0,
+        });
+      }
+    } catch (err) {
+      console.error("Error loading counters:", err);
+    }
   };
 
   const handleCounterChange = (key: string, value: number) => {
     setCounters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = () => {
-    // TODO: Save to Firebase
-    alert("تم حفظ البيانات بنجاح!");
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage("");
+    try {
+      const docRef = doc(db, "settings", "counters");
+      await setDoc(docRef, counters);
+      setMessage("تم حفظ البيانات بنجاح!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err: any) {
+      setMessage("خطأ في حفظ البيانات: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setLocation("/");
+    } catch (err) {
+      console.error("Error signing out:", err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p>جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-green-600 text-white py-4 px-6 shadow-md">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">لوحة التحكم الإدارية</h1>
+          <div>
+            <h1 className="text-2xl font-bold">لوحة التحكم الإدارية</h1>
+            <p className="text-sm text-green-100">مرحباً: {user.email}</p>
+          </div>
           <Button
             onClick={handleLogout}
             className="bg-red-600 hover:bg-red-700 text-white"
@@ -46,73 +117,54 @@ export default function AdminDashboard() {
         <div className="flex gap-4 mb-6 bg-white rounded-lg shadow p-4">
           <button
             onClick={() => setActiveTab("dashboard")}
-            className={`px-4 py-2 rounded font-semibold ${
+            className={`px-4 py-2 rounded font-semibold transition ${
               activeTab === "dashboard"
                 ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             لوحة التحكم
           </button>
           <button
-            onClick={() => setActiveTab("counters")}
-            className={`px-4 py-2 rounded font-semibold ${
-              activeTab === "counters"
-                ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            }`}
-          >
-            الإحصائيات
-          </button>
-          <button
             onClick={() => setActiveTab("gallery")}
-            className={`px-4 py-2 rounded font-semibold ${
+            className={`px-4 py-2 rounded font-semibold transition ${
               activeTab === "gallery"
                 ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             المعرض
           </button>
           <button
             onClick={() => setActiveTab("messages")}
-            className={`px-4 py-2 rounded font-semibold ${
+            className={`px-4 py-2 rounded font-semibold transition ${
               activeTab === "messages"
                 ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             الرسائل
           </button>
         </div>
 
-        {/* Dashboard Tab */}
-        {activeTab === "dashboard" && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-gray-600 font-semibold mb-2">الأيتام</h3>
-              <p className="text-4xl font-bold text-green-600">{counters.orphans}</p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-gray-600 font-semibold mb-2">الطلاب</h3>
-              <p className="text-4xl font-bold text-blue-600">{counters.students}</p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-gray-600 font-semibold mb-2">المرضى</h3>
-              <p className="text-4xl font-bold text-red-600">{counters.patients}</p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-gray-600 font-semibold mb-2">الأسر</h3>
-              <p className="text-4xl font-bold text-purple-600">{counters.families}</p>
-            </div>
+        {/* Message Alert */}
+        {message && (
+          <div
+            className={`mb-6 p-4 rounded ${
+              message.includes("خطأ")
+                ? "bg-red-100 text-red-700 border border-red-300"
+                : "bg-green-100 text-green-700 border border-green-300"
+            }`}
+          >
+            {message}
           </div>
         )}
 
-        {/* Counters Tab */}
-        {activeTab === "counters" && (
+        {/* Dashboard Tab */}
+        {activeTab === "dashboard" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">تحديث الإحصائيات</h2>
-            <div className="space-y-4">
+            <h2 className="text-2xl font-bold mb-6">الإحصائيات</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-gray-700 font-semibold mb-2">
                   عدد الأيتام
@@ -120,7 +172,9 @@ export default function AdminDashboard() {
                 <input
                   type="number"
                   value={counters.orphans}
-                  onChange={(e) => handleCounterChange("orphans", parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCounterChange("orphans", parseInt(e.target.value))
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
                 />
               </div>
@@ -131,7 +185,9 @@ export default function AdminDashboard() {
                 <input
                   type="number"
                   value={counters.students}
-                  onChange={(e) => handleCounterChange("students", parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCounterChange("students", parseInt(e.target.value))
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
                 />
               </div>
@@ -142,7 +198,9 @@ export default function AdminDashboard() {
                 <input
                   type="number"
                   value={counters.patients}
-                  onChange={(e) => handleCounterChange("patients", parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCounterChange("patients", parseInt(e.target.value))
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
                 />
               </div>
@@ -153,33 +211,33 @@ export default function AdminDashboard() {
                 <input
                   type="number"
                   value={counters.families}
-                  onChange={(e) => handleCounterChange("families", parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCounterChange("families", parseInt(e.target.value))
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
                 />
               </div>
-              <Button
-                onClick={handleSave}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
-              >
-                حفظ التغييرات
-              </Button>
             </div>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6"
+            >
+              {saving ? "جاري الحفظ..." : "حفظ البيانات"}
+            </Button>
           </div>
         )}
 
         {/* Gallery Tab */}
         {activeTab === "gallery" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">إدارة المعرض</h2>
-            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+            <h2 className="text-2xl font-bold mb-6">إدارة المعرض</h2>
+            <p className="text-gray-600 mb-4">
+              يمكنك إضافة الصور من خلال Firebase Storage Console
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded p-4">
               <p className="text-blue-800">
-                <strong>ملاحظة:</strong> يمكنك إضافة الصور يدويًا إلى مجلد public/images وسيتم عرضها تلقائيًا في المعرض.
-              </p>
-            </div>
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📁</div>
-              <p className="text-gray-600 text-lg">
-                سيتم إضافة خاصية رفع الصور قريبًا
+                <strong>ملاحظة:</strong> لإضافة صور جديدة، استخدم Firebase Storage Console
               </p>
             </div>
           </div>
@@ -188,10 +246,10 @@ export default function AdminDashboard() {
         {/* Messages Tab */}
         {activeTab === "messages" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">الرسائل المستلمة</h2>
-            <div className="text-center text-gray-600 py-8">
-              لا توجد رسائل حالياً
-            </div>
+            <h2 className="text-2xl font-bold mb-6">الرسائل</h2>
+            <p className="text-gray-600">
+              سيتم عرض الرسائل المرسلة من نموذج الاتصال هنا
+            </p>
           </div>
         )}
       </div>

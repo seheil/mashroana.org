@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -15,19 +17,24 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // TODO: Implement Firebase Authentication
-      // For now, use a demo login
-      if (email === "admin@mashroana.org" && password === "admin123") {
-        localStorage.setItem("adminToken", "demo-token-" + Date.now());
-        setLocation("/admin-dashboard");
-      } else {
-        setError("بيانات الدخول غير صحيحة");
-      }
+      await signInWithEmailAndPassword(auth, email, password);
+      setLocation("/admin-dashboard");
     } catch (err: any) {
-      setError(err.message || "حدث خطأ أثناء تسجيل الدخول");
+      setError(getErrorMessage(err.code));
     } finally {
       setLoading(false);
     }
+  };
+
+  const getErrorMessage = (code: string) => {
+    const messages: { [key: string]: string } = {
+      "auth/invalid-email": "البريد الإلكتروني غير صحيح",
+      "auth/user-disabled": "الحساب معطل",
+      "auth/user-not-found": "المستخدم غير موجود",
+      "auth/wrong-password": "كلمة المرور غير صحيحة",
+      "auth/too-many-requests": "محاولات دخول كثيرة جداً، حاول لاحقاً",
+    };
+    return messages[code] || "حدث خطأ في الدخول";
   };
 
   return (
@@ -87,11 +94,9 @@ export default function AdminLogin() {
 
         <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
           <p className="text-sm text-blue-800">
-            <strong>بيانات التجربة:</strong>
+            <strong>ملاحظة:</strong>
             <br />
-            البريد: admin@mashroana.org
-            <br />
-            كلمة المرور: admin123
+            استخدم بيانات حسابك في Firebase للدخول إلى لوحة التحكم.
           </p>
         </div>
 
