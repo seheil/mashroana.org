@@ -11,6 +11,8 @@ import Privacy from "./pages/Privacy";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import { SadaqahAdvisor } from "./components/SadaqahAdvisor";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 import Admin from "./pages/Admin";
 import AdminPanel from "./pages/AdminPanel";
 
@@ -24,6 +26,8 @@ function Router() {
           <Route path={"/about"} component={About} />
           <Route path={"/contact"} component={Contact} />
           <Route path={"/privacy"} component={Privacy} />
+          <Route path={"/admin-login"} component={AdminLogin} />
+          <Route path={"/admin-dashboard"} component={AdminDashboard} />
           <Route path={"/admin"} component={Admin} />
           <Route path={"/admin-panel"} component={AdminPanel} />
           <Route path={"/404"} component={NotFound} />
