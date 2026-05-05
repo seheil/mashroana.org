@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, orderBy, onSnapshot } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -18,6 +18,8 @@ export default function AdminDashboard() {
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user) {
       loadCounters();
+      loadMessages();
     }
   }, [user]);
 
@@ -48,6 +51,26 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error("Error loading counters:", err);
+    }
+  };
+
+  const loadMessages = async () => {
+    try {
+      setLoadingMessages(true);
+      const messagesRef = collection(db, "messages");
+      const q = query(messagesRef, orderBy("timestamp", "desc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const msgs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setMessages(msgs);
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.error("Error loading messages:", err);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -232,13 +255,19 @@ export default function AdminDashboard() {
         {activeTab === "gallery" && (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-2xl font-bold mb-6">إدارة المعرض</h2>
-            <p className="text-gray-600 mb-4">
-              يمكنك إضافة الصور من خلال Firebase Storage Console
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded p-4">
-              <p className="text-blue-800">
-                <strong>ملاحظة:</strong> لإضافة صور جديدة، استخدم Firebase Storage Console
-              </p>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
+              <div className="flex items-start">
+                <div className="text-3xl mr-4">⏳</div>
+                <div>
+                  <h3 className="text-lg font-bold text-yellow-800 mb-2">رفع الصور قيد التطوير</h3>
+                  <p className="text-yellow-700 mb-3">
+                    سيتم تفعيل خاصية رفع الصور إلى المعرض لاحقاً بعد إكمال إعدادات Firebase Storage.
+                  </p>
+                  <p className="text-yellow-600 text-sm">
+                    حالياً، المعرض يعرض صور ثابتة. سيتم تحديث هذه الصفحة قريباً.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -246,10 +275,37 @@ export default function AdminDashboard() {
         {/* Messages Tab */}
         {activeTab === "messages" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-6">الرسائل</h2>
-            <p className="text-gray-600">
-              سيتم عرض الرسائل المرسلة من نموذج الاتصال هنا
-            </p>
+            <h2 className="text-2xl font-bold mb-6">الرسائل المستلمة</h2>
+            {loadingMessages && (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <p className="mt-2 text-gray-600">جاري تحميل الرسائل...</p>
+              </div>
+            )}
+            {!loadingMessages && messages.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500 text-lg">لا توجد رسائل حالياً</p>
+              </div>
+            )}
+            {!loadingMessages && messages.length > 0 && (
+              <div className="space-y-4">
+                {messages.map((msg: any) => (
+                  <div key={msg.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-bold text-gray-800">{msg.name}</h3>
+                        <p className="text-sm text-gray-600">{msg.email}</p>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleDateString("ar-EG") : ""}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">☎️ {msg.phone}</p>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded">{msg.message}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
