@@ -8,8 +8,10 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
+import Gallery from "./pages/Gallery";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
+import FloatingButtons from "./components/FloatingButtons";
 import { SadaqahAdvisor } from "./components/SadaqahAdvisor";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -26,6 +28,7 @@ function Router() {
           <Route path={"/about"} component={About} />
           <Route path={"/contact"} component={Contact} />
           <Route path={"/privacy"} component={Privacy} />
+          <Route path={"/gallery"} component={Gallery} />
           <Route path={"/admin-login"} component={AdminLogin} />
           <Route path={"/admin-dashboard"} component={AdminDashboard} />
           <Route path={"/admin"} component={Admin} />
@@ -35,6 +38,7 @@ function Router() {
         </Switch>
       </main>
       <Footer />
+      <FloatingButtons />
     </div>
   );
 }
