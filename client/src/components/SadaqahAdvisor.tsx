@@ -7,7 +7,10 @@ import {
   DONATION_METHODS,
   FAQ_ITEMS,
   getIntelligentDonationRecommendation,
-} from "@/shared/foundation-knowledge";
+} from "@shared/foundation-knowledge";
+
+// Re-export types for client usage
+export type { FoundationInfo, Program, DonationMethod, FAQ } from "@shared/foundation-knowledge";
 
 interface Message {
   id: string;

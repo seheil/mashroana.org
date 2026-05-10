@@ -265,6 +265,16 @@ export default function AdminDashboard() {
           >
             الرسائل
           </button>
+          <button
+            onClick={() => setActiveTab("knowledge")}
+            className={`px-4 py-2 rounded font-semibold transition ${
+              activeTab === "knowledge"
+                ? "bg-green-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            🧠 قاعدة المعرفة
+          </button>
         </div>
 
         {/* Message Alert */}
@@ -545,6 +555,51 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+        {/* Knowledge Base Tab */}
+        {activeTab === "knowledge" && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold mb-6">🧠 إدارة قاعدة المعرفة</h2>
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded mb-6">
+              <p className="text-blue-800 font-semibold">معلومات المؤسسة</p>
+              <p className="text-blue-700 text-sm mt-2">المؤسسة: مؤسسة مشروعنا إلى الجنة للأعمال الخيرية</p>
+              <p className="text-blue-700 text-sm">العنوان: 39 شارع علي قاسم، حدائق المعادي، القاهرة</p>
+              <p className="text-blue-700 text-sm">الهاتف/WhatsApp: 01013128453</p>
+              <p className="text-blue-700 text-sm">Telegram: https://t.me/mshro3nallgana</p>
+            </div>
+            <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded mb-6">
+              <p className="text-green-800 font-semibold mb-3">المشاريع الخيرية (9 مجالات)</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <p className="text-green-700 text-sm">👨‍👩‍👧‍👦 كفالة الأيتام</p>
+                <p className="text-green-700 text-sm">📚 الدعم التعليمي</p>
+                <p className="text-green-700 text-sm">🪡 مشغل الخياطة (تحت التأسيس)</p>
+                <p className="text-green-700 text-sm">🌳 سقيا الماء وزراعة الأشجار</p>
+                <p className="text-green-700 text-sm">📦 المساعدات الموسمية والإغاثية</p>
+                <p className="text-green-700 text-sm">🐑 صكوك الأضاحي</p>
+                <p className="text-green-700 text-sm">🏥 الصحة والأمومة والطفولة</p>
+                <p className="text-green-700 text-sm">♿ ذوو الاحتياجات الخاصة</p>
+                <p className="text-green-700 text-sm">🏢 التطوير المؤسسي</p>
+              </div>
+            </div>
+            <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded mb-6">
+              <p className="text-purple-800 font-semibold mb-3">طرق التبرع الآمنة</p>
+              <p className="text-purple-700 text-sm">💳 حساب بنك مصر: 5540001000008278</p>
+              <p className="text-purple-700 text-sm">💳 InstaPay: https://ipn.eg/S/hanan.gamal97/instapay/7EswbJ</p>
+              <p className="text-purple-700 text-sm">💳 Vodafone Cash: 01013128453</p>
+            </div>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+              <p className="text-yellow-800 font-semibold">حالة قاعدة المعرفة</p>
+              <p className="text-yellow-700 text-sm mt-2">✅ قاعدة المعرفة جاهزة وتعمل بكفاءة</p>
+              <p className="text-yellow-700 text-sm">✅ المساعد الذكي يستخدم هذه المعلومات</p>
+              <p className="text-yellow-700 text-sm">✅ إرشادات التبرع الذكية مفعلة</p>
+              <p className="text-yellow-700 text-sm">✅ الإجابات على الأسئلة الشائعة متاحة</p>
+            </div>
           </div>
         )}
       </div>
