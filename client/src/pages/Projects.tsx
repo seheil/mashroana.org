@@ -14,6 +14,7 @@ interface Project {
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,21 +24,32 @@ export default function Projects() {
   const loadProjects = () => {
     try {
       setLoading(true);
+      setError(null);
       const projectsRef = collection(db, "projects");
       const q = query(projectsRef, orderBy("createdAt", "desc"));
       
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const projectsList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Project[];
-        setProjects(projectsList);
-        setLoading(false);
-      });
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const projectsList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Project[];
+          setProjects(projectsList);
+          setLoading(false);
+          setError(null);
+        },
+        (err) => {
+          console.error("Error loading projects:", err);
+          setError("حدث خطأ في تحميل المشاريع. يرجى المحاولة لاحقاً.");
+          setLoading(false);
+        }
+      );
 
       return unsubscribe;
     } catch (err) {
       console.error("Error loading projects:", err);
+      setError("حدث خطأ في تحميل المشاريع.");
       setLoading(false);
     }
   };
@@ -62,6 +74,12 @@ export default function Projects() {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
             مشاريعنا الخيرية
           </h2>
+
+          {error && (
+            <div className="mb-6 p-4 rounded bg-red-100 text-red-700 border border-red-300">
+              {error}
+            </div>
+          )}
 
           {loading ? (
             <div className="text-center py-12">

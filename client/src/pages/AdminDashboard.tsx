@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -24,6 +24,8 @@ export default function AdminDashboard() {
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "", icon: "" });
   const [addingProject, setAddingProject] = useState(false);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editData, setEditData] = useState({ name: "", description: "", icon: "" });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -138,6 +140,31 @@ export default function AdminDashboard() {
       setMessage("خطأ في إضافة المشروع: " + err.message);
     } finally {
       setAddingProject(false);
+    }
+  };
+
+  const handleEditProject = (project: any) => {
+    setEditingProject(project.id);
+    setEditData({
+      name: project.name,
+      description: project.description,
+      icon: project.icon,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProject || !editData.name || !editData.description || !editData.icon) {
+      setMessage("الرجاء ملء جميع الحقول");
+      return;
+    }
+    try {
+      const projectRef = doc(db, "projects", editingProject);
+      await updateDoc(projectRef, editData);
+      setMessage("تم تحديث المشروع بنجاح!");
+      setEditingProject(null);
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err: any) {
+      setMessage("خطأ في تحديث المشروع: " + err.message);
     }
   };
 
@@ -385,25 +412,80 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <p className="text-sm text-gray-600 mb-4">إجمالي المشاريع: <strong>{projects.length}</strong></p>
                 {projects.map((project: any) => (
-                  <div key={project.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-800">
-                          {project.icon} {project.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                  <div key={project.id}>
+                    {editingProject === project.id ? (
+                      <div className="border-l-4 border-blue-600 bg-blue-50 rounded-lg p-4 mb-4">
+                        <h3 className="text-lg font-bold mb-3 text-gray-800">تعديل المشروع</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                          <input
+                            type="text"
+                            value={editData.name}
+                            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                            className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600"
+                            placeholder="اسم المشروع"
+                          />
+                          <input
+                            type="text"
+                            value={editData.icon}
+                            onChange={(e) => setEditData({ ...editData, icon: e.target.value })}
+                            className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600"
+                            placeholder="الأيقونة"
+                            maxLength={2}
+                          />
+                          <input
+                            type="text"
+                            value={editData.description}
+                            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                            className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600"
+                            placeholder="الوصف"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleSaveEdit}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-sm"
+                          >
+                            💾 حفظ
+                          </button>
+                          <button
+                            onClick={() => setEditingProject(null)}
+                            className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded text-sm"
+                          >
+                            ❌ إلغاء
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => handleDeleteProject(project.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm ml-2"
-                      >
-                        🗑️ حذف
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {project.icon} {project.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                          </div>
+                          <div className="flex gap-2 ml-2">
+                            <button
+                              onClick={() => handleEditProject(project)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm"
+                            >
+                              ✏️ تعديل
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProject(project.id)}
+                              className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm"
+                            >
+                              🗑️ حذف
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-            )}
+            )
+            }
           </div>
         )}
 
