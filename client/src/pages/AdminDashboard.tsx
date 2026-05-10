@@ -557,10 +557,6 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
-      </div>
-    </div>
-  );
-}
 
         {/* Knowledge Base Tab */}
         {activeTab === "knowledge" && (
@@ -606,3 +602,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
