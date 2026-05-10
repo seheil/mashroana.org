@@ -17,6 +17,8 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import Admin from "./pages/Admin";
 import AdminPanel from "./pages/AdminPanel";
+import Projects from "./pages/Projects";
+import Achievements from "./pages/Achievements";
 
 function Router() {
   return (
@@ -29,6 +31,8 @@ function Router() {
           <Route path={"/contact"} component={Contact} />
           <Route path={"/privacy"} component={Privacy} />
           <Route path={"/gallery"} component={Gallery} />
+          <Route path={"/projects"} component={Projects} />
+          <Route path={"/achievements"} component={Achievements} />
           <Route path={"/admin-login"} component={AdminLogin} />
           <Route path={"/admin-dashboard"} component={AdminDashboard} />
           <Route path={"/admin"} component={Admin} />

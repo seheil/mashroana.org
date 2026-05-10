@@ -8,7 +8,8 @@ export default function Navigation() {
   const navItems = [
     { label: "الرئيسية", href: "/" },
     { label: "عن المؤسسة", href: "/about" },
-    { label: "المشاريع", href: "/#programs" },
+    { label: "المشاريع", href: "/projects" },
+    { label: "إنجازاتنا", href: "/achievements" },
     { label: "تبرع", href: "/#donate" },
     { label: "تواصل معنا", href: "/contact" },
   ];

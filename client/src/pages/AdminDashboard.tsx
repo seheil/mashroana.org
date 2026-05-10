@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { doc, getDoc, setDoc, collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -20,6 +20,10 @@ export default function AdminDashboard() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [newProject, setNewProject] = useState({ name: "", description: "", icon: "" });
+  const [addingProject, setAddingProject] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -33,6 +37,7 @@ export default function AdminDashboard() {
     if (user) {
       loadCounters();
       loadMessages();
+      loadProjects();
     }
   }, [user]);
 
@@ -74,6 +79,26 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadProjects = async () => {
+    try {
+      setLoadingProjects(true);
+      const projectsRef = collection(db, "projects");
+      const q = query(projectsRef, orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const proj = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProjects(proj);
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.error("Error loading projects:", err);
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
+
   const handleCounterChange = (key: string, value: number) => {
     setCounters((prev) => ({ ...prev, [key]: value }));
   };
@@ -90,6 +115,41 @@ export default function AdminDashboard() {
       setMessage("خطأ في حفظ البيانات: " + err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddProject = async () => {
+    if (!newProject.name || !newProject.description || !newProject.icon) {
+      setMessage("الرجاء ملء جميع الحقول");
+      return;
+    }
+    setAddingProject(true);
+    setMessage("");
+    try {
+      const projectsRef = collection(db, "projects");
+      await addDoc(projectsRef, {
+        ...newProject,
+        createdAt: serverTimestamp(),
+      });
+      setMessage("تم إضافة المشروع بنجاح!");
+      setNewProject({ name: "", description: "", icon: "" });
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err: any) {
+      setMessage("خطأ في إضافة المشروع: " + err.message);
+    } finally {
+      setAddingProject(false);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا المشروع؟")) return;
+    try {
+      const projectRef = doc(db, "projects", projectId);
+      await deleteDoc(projectRef);
+      setMessage("تم حذف المشروع بنجاح!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err: any) {
+      setMessage("خطأ في حذف المشروع: " + err.message);
     }
   };
 
@@ -137,7 +197,7 @@ export default function AdminDashboard() {
 
       <div className="max-w-6xl mx-auto p-6">
         {/* Navigation Tabs */}
-        <div className="flex gap-4 mb-6 bg-white rounded-lg shadow p-4">
+        <div className="flex gap-4 mb-6 bg-white rounded-lg shadow p-4 flex-wrap">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`px-4 py-2 rounded font-semibold transition ${
@@ -147,6 +207,16 @@ export default function AdminDashboard() {
             }`}
           >
             لوحة التحكم
+          </button>
+          <button
+            onClick={() => setActiveTab("projects")}
+            className={`px-4 py-2 rounded font-semibold transition ${
+              activeTab === "projects"
+                ? "bg-green-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            المشاريع
           </button>
           <button
             onClick={() => setActiveTab("gallery")}
@@ -251,6 +321,92 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Projects Tab */}
+        {activeTab === "projects" && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold mb-6">إدارة المشاريع</h2>
+            
+            {/* Add New Project Form */}
+            <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-6 mb-8 border-l-4 border-green-600">
+              <h3 className="text-lg font-bold mb-4">إضافة مشروع جديد</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">اسم المشروع</label>
+                  <input
+                    type="text"
+                    value={newProject.name}
+                    onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                    placeholder="مثال: كفالة الأيتام"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">الأيقونة (emoji)</label>
+                  <input
+                    type="text"
+                    value={newProject.icon}
+                    onChange={(e) => setNewProject({ ...newProject, icon: e.target.value })}
+                    placeholder="مثال: 👶"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
+                    maxLength={2}
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">الوصف</label>
+                  <input
+                    type="text"
+                    value={newProject.description}
+                    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                    placeholder="وصف المشروع"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-600"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleAddProject}
+                disabled={addingProject}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded disabled:bg-gray-400 transition"
+              >
+                {addingProject ? "جاري الإضافة..." : "✅ إضافة المشروع"}
+              </button>
+            </div>
+
+            {/* Projects List */}
+            {loadingProjects ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <p className="mt-2 text-gray-600">جاري تحميل المشاريع...</p>
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="text-center py-8 bg-gray-50 rounded">
+                <p className="text-gray-500 text-lg">لا توجد مشاريع حالياً - أضف مشروع جديد</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 mb-4">إجمالي المشاريع: <strong>{projects.length}</strong></p>
+                {projects.map((project: any) => (
+                  <div key={project.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-800">
+                          {project.icon} {project.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteProject(project.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm ml-2"
+                      >
+                        🗑️ حذف
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Gallery Tab */}
         {activeTab === "gallery" && (
           <div className="bg-white rounded-lg shadow p-6">
@@ -289,6 +445,7 @@ export default function AdminDashboard() {
             )}
             {!loadingMessages && messages.length > 0 && (
               <div className="space-y-4">
+                <p className="text-sm text-gray-600 mb-4">إجمالي الرسائل: <strong>{messages.length}</strong></p>
                 {messages.map((msg: any) => (
                   <div key={msg.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
                     <div className="flex justify-between items-start mb-2">
