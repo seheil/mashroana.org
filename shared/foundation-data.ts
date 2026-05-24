@@ -13,7 +13,7 @@ export const foundationData = {
     phone: "01013128453",
     whatsapp: "https://wa.me/201013128453",
     telegram: "https://t.me/mshro3nallgana",
-    facebook: "https://www.facebook.com/61582145746691/",
+    facebook: "https://www.facebook.com/Mashroana1",
     email: "contact@mashroana.org", // placeholder
     address: "39 شارع علي قاسم، حدائق المعادي، القاهرة",
     addressEn: "39 Ali Qassem Street, Maadi Gardens, Cairo",
