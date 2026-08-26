@@ -35,6 +35,21 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/media" className="text-gray-400 hover:text-white">
+                  مكتبة الوسائط
+                </Link>
+              </li>
+              <li>
+                <Link href="/transparency" className="text-gray-400 hover:text-white">
+                  الشفافية والحوكمة
+                </Link>
+              </li>
+              <li>
+                <Link href="/partnerships" className="text-gray-400 hover:text-white">
+                  الشراكات والمنح
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy" className="text-gray-400 hover:text-white">
                   سياسة الخصوصية
                 </Link>

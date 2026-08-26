@@ -20,6 +20,10 @@ import {
   FirestoreProject,
   FirestoreAchievement,
   FirestoreSettings,
+  FirestoreContactMessage,
+  FirestoreMediaItem,
+  FirestoreTask,
+  FirestoreDocument,
   FIRESTORE_COLLECTIONS,
   DEFAULT_SETTINGS_ID,
 } from "@shared/firestore-schemas";
@@ -79,14 +83,21 @@ export async function getAllProjects(): Promise<FirestoreProject[]> {
   }
 }
 
-export function subscribeToProjects(callback: (projects: FirestoreProject[]) => void) {
-  return onSnapshot(collection(db, FIRESTORE_COLLECTIONS.PROJECTS), (snapshot) => {
-    const projects = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    } as FirestoreProject));
-    callback(projects);
-  });
+export function subscribeToProjects(
+  callback: (projects: FirestoreProject[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.PROJECTS),
+    (snapshot) => {
+      const projects = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      } as FirestoreProject));
+      callback(projects);
+    },
+    (error) => onError?.(error)
+  );
 }
 
 // ============================================================================
@@ -148,16 +159,23 @@ export async function getAllAchievements(): Promise<FirestoreAchievement[]> {
   }
 }
 
-export function subscribeToAchievements(callback: (achievements: FirestoreAchievement[]) => void) {
-  return onSnapshot(collection(db, FIRESTORE_COLLECTIONS.ACHIEVEMENTS), (snapshot) => {
-    const achievements = snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      } as FirestoreAchievement))
-      .sort((a, b) => (b.year || 0) - (a.year || 0));
-    callback(achievements);
-  });
+export function subscribeToAchievements(
+  callback: (achievements: FirestoreAchievement[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.ACHIEVEMENTS),
+    (snapshot) => {
+      const achievements = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        } as FirestoreAchievement))
+        .sort((a, b) => (b.year || 0) - (a.year || 0));
+      callback(achievements);
+    },
+    (error) => onError?.(error)
+  );
 }
 
 // ============================================================================
@@ -210,30 +228,39 @@ export async function updateSettings(updates: Partial<FirestoreSettings>) {
   }
 }
 
-export function subscribeToSettings(callback: (settings: FirestoreSettings) => void) {
-  return onSnapshot(collection(db, FIRESTORE_COLLECTIONS.SETTINGS), (snapshot) => {
-    if (snapshot.empty) {
+export function subscribeToSettings(
+  callback: (settings: FirestoreSettings) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.SETTINGS),
+    (snapshot) => {
+      if (snapshot.empty) {
+        callback({
+          orphans: 0,
+          students: 0,
+          patients: 0,
+          families: 0,
+        });
+        return;
+      }
+      const doc = snapshot.docs[0];
       callback({
-        orphans: 0,
-        students: 0,
-        patients: 0,
-        families: 0,
-      });
-      return;
-    }
-    const doc = snapshot.docs[0];
-    callback({
-      id: doc.id,
-      ...doc.data(),
-    } as FirestoreSettings);
-  });
+        id: doc.id,
+        ...doc.data(),
+      } as FirestoreSettings);
+    },
+    (error) => onError?.(error)
+  );
 }
 
 // ============================================================================
 // CONTACT MESSAGES OPERATIONS
 // ============================================================================
 
-export async function addContactMessage(message: Omit<FirestoreAchievement, "id">) {
+export async function addContactMessage(
+  message: Omit<FirestoreContactMessage, "id" | "timestamp" | "read">
+) {
   try {
     const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.CONTACT_MESSAGES), {
       ...message,
@@ -262,12 +289,14 @@ export async function getAllContactMessages() {
   }
 }
 
-export function subscribeToContactMessages(callback: (messages: any[]) => void) {
+export function subscribeToContactMessages(
+  callback: (messages: FirestoreContactMessage[]) => void
+) {
   return onSnapshot(collection(db, FIRESTORE_COLLECTIONS.CONTACT_MESSAGES), (snapshot) => {
     const messages = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    } as FirestoreContactMessage));
     callback(messages);
   });
 }
@@ -280,4 +309,130 @@ export async function deleteContactMessage(id: string) {
     console.error("Error deleting contact message:", error);
     throw error;
   }
+}
+
+// ============================================================================
+// MEDIA LIBRARY OPERATIONS
+// ============================================================================
+
+export async function addMediaItem(media: Omit<FirestoreMediaItem, "id">) {
+  const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.MEDIA), {
+    ...media,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return { id: docRef.id, ...media };
+}
+
+export async function updateMediaItem(id: string, updates: Partial<FirestoreMediaItem>) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.MEDIA, id), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+  return { id, ...updates };
+}
+
+export async function deleteMediaItem(id: string) {
+  await deleteDoc(doc(db, FIRESTORE_COLLECTIONS.MEDIA, id));
+  return id;
+}
+
+export function subscribeToMediaItems(
+  callback: (items: FirestoreMediaItem[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.MEDIA),
+    (snapshot) => {
+      const items = snapshot.docs
+        .map((mediaDoc) => ({ id: mediaDoc.id, ...mediaDoc.data() } as FirestoreMediaItem))
+        .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      callback(items);
+    },
+    (error) => onError?.(error)
+  );
+}
+
+// ============================================================================
+// OPERATIONS TASKS
+// ============================================================================
+
+export async function addTask(task: Omit<FirestoreTask, "id">) {
+  const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.TASKS), {
+    ...task,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return { id: docRef.id, ...task };
+}
+
+export async function updateTask(id: string, updates: Partial<FirestoreTask>) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.TASKS, id), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+  return { id, ...updates };
+}
+
+export async function deleteTask(id: string) {
+  await deleteDoc(doc(db, FIRESTORE_COLLECTIONS.TASKS, id));
+  return id;
+}
+
+export function subscribeToTasks(
+  callback: (tasks: FirestoreTask[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.TASKS),
+    (snapshot) => {
+      const tasks = snapshot.docs.map(
+        (taskDoc) => ({ id: taskDoc.id, ...taskDoc.data() } as FirestoreTask)
+      );
+      callback(tasks);
+    },
+    (error) => onError?.(error)
+  );
+}
+
+// ============================================================================
+// PUBLIC DOCUMENT OPERATIONS
+// ============================================================================
+
+export async function addDocument(documentItem: Omit<FirestoreDocument, "id">) {
+  const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.DOCUMENTS), {
+    ...documentItem,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return { id: docRef.id, ...documentItem };
+}
+
+export async function updateDocument(id: string, updates: Partial<FirestoreDocument>) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.DOCUMENTS, id), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+  return { id, ...updates };
+}
+
+export async function deleteDocument(id: string) {
+  await deleteDoc(doc(db, FIRESTORE_COLLECTIONS.DOCUMENTS, id));
+  return id;
+}
+
+export function subscribeToDocuments(
+  callback: (documents: FirestoreDocument[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.DOCUMENTS),
+    (snapshot) => {
+      const documents = snapshot.docs.map(
+        (documentDoc) => ({ id: documentDoc.id, ...documentDoc.data() } as FirestoreDocument)
+      );
+      callback(documents);
+    },
+    (error) => onError?.(error)
+  );
 }

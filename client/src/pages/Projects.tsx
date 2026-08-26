@@ -18,6 +18,9 @@ export default function Projects() {
         setProjects(projectsList);
         setLoading(false);
         setError(null);
+      }, () => {
+        setError("حدث خطأ في تحميل المشاريع. يرجى المحاولة لاحقاً.");
+        setLoading(false);
       });
 
       return () => {

@@ -10,6 +10,9 @@ export default function Navigation() {
     { label: "عن المؤسسة", href: "/about" },
     { label: "المشاريع", href: "/projects" },
     { label: "إنجازاتنا", href: "/achievements" },
+    { label: "المكتبة", href: "/media" },
+    { label: "الشفافية", href: "/transparency" },
+    { label: "الشراكات", href: "/partnerships" },
     { label: "تبرع", href: "/#donate" },
     { label: "تواصل معنا", href: "/contact" },
   ];
@@ -51,7 +54,7 @@ export default function Navigation() {
               href="/admin"
               className="text-gray-600 hover:text-gray-800 font-semibold"
             >
-              Admin
+              الإدارة
             </Link>
           </div>
 

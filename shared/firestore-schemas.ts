@@ -21,7 +21,7 @@ export interface FirestoreAchievement {
   patients?: number;
   families?: number;
   icon: string;
-  imagePath?: string; // Local public folder path only
+  imagePath?: string;
   createdAt?: number;
   updatedAt?: number;
 }
@@ -32,6 +32,25 @@ export interface FirestoreSettings {
   students: number;
   patients: number;
   families: number;
+  heroTitle?: string;
+  heroDescription?: string;
+  partnershipTitle?: string;
+  aboutHeadline?: string;
+  aboutDescription?: string;
+  aboutMission?: string;
+  aboutCommitments?: string;
+  transparencyHeadline?: string;
+  transparencyDescription?: string;
+  transparencyGovernance?: string;
+  transparencyImpact?: string;
+  transparencyDocuments?: string;
+  partnershipsHeadline?: string;
+  partnershipsDescription?: string;
+  partnershipsWhy?: string;
+  partnershipsPrograms?: string;
+  partnershipsImpact?: string;
+  partnershipsMedia?: string;
+  partnershipsDueDiligence?: string;
   updatedAt?: number;
 }
 
@@ -45,6 +64,56 @@ export interface FirestoreContactMessage {
   read?: boolean;
 }
 
+export type MediaKind = "image" | "video";
+export type PublishStatus = "draft" | "published" | "archived";
+
+export interface FirestoreMediaItem {
+  id?: string;
+  title: string;
+  description: string;
+  kind: MediaKind;
+  mediaUrl: string;
+  thumbnailUrl?: string;
+  category: string;
+  projectId?: string;
+  capturedAt?: string;
+  location?: string;
+  altText: string;
+  rightsNote: string;
+  consentConfirmed: boolean;
+  status: PublishStatus;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export type TaskStatus = "todo" | "in_progress" | "done";
+export type TaskPriority = "low" | "medium" | "high";
+
+export interface FirestoreTask {
+  id?: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate?: string;
+  owner?: string;
+  projectId?: string;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export interface FirestoreDocument {
+  id?: string;
+  title: string;
+  description: string;
+  category: "registration" | "governance" | "financial" | "annual_report" | "policy" | "other";
+  year?: number;
+  documentUrl: string;
+  status: PublishStatus;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
 /**
  * Collection names for Firestore
  */
@@ -53,6 +122,9 @@ export const FIRESTORE_COLLECTIONS = {
   ACHIEVEMENTS: "achievements",
   SETTINGS: "settings",
   CONTACT_MESSAGES: "contactMessages",
+  MEDIA: "media",
+  TASKS: "tasks",
+  DOCUMENTS: "documents",
 } as const;
 
 /**

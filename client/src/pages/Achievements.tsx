@@ -16,6 +16,9 @@ export default function Achievements() {
         setAchievements(achievementsList);
         setLoading(false);
         setError(null);
+      }, () => {
+        setError("حدث خطأ في تحميل الإنجازات. يرجى المحاولة لاحقاً.");
+        setLoading(false);
       });
 
       return () => {
@@ -66,8 +69,16 @@ export default function Achievements() {
                 key={achievement.id}
                 className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden"
               >
-                <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                  <div className="text-6xl">{achievement.icon}</div>
+                <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
+                  {achievement.imagePath ? (
+                    <img
+                      src={achievement.imagePath}
+                      alt={`توثيق ${achievement.title}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-6xl">{achievement.icon}</div>
+                  )}
                 </div>
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-2">
@@ -104,10 +115,9 @@ export default function Achievements() {
                       </div>
                     ) : null}
                   </div>
-
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition">
-                    اعرف المزيد
-                  </button>
+                  <p className="border-t border-slate-100 pt-4 text-xs leading-5 text-slate-500">
+                    تُحدّث بيانات هذا الإنجاز ومؤشراته من لوحة إدارة المؤسسة.
+                  </p>
                 </div>
               </div>
             ))}

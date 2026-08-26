@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, ExternalLink, Loader } from 'lucide-react';
+import { ExternalLink, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 
@@ -60,7 +60,7 @@ export default function FacebookFeed() {
             تابعنا على Facebook لمعرفة آخر المشاريع والإنجازات
           </p>
           <a
-            href="https://www.facebook.com/61582145746691/"
+            href="https://www.facebook.com/Mashroana1"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -135,30 +135,15 @@ export default function FacebookFeed() {
                   </div>
                 </div>
 
-                {/* Post Actions */}
-                <div className="px-6 py-3 flex gap-3 border-t border-gray-100">
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <Heart size={18} />
-                    <span>إعجاب</span>
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <MessageCircle size={18} />
-                    <span>تعليق</span>
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                    <Share2 size={18} />
-                    <span>مشاركة</span>
-                  </button>
-                </div>
               </motion.div>
             ))}
           </div>
         )}
 
         {/* No Posts State */}
-        {!isLoading && posts.length === 0 && !error && (
+        {!isLoading && posts.length === 0 && (
           <div className="text-center py-12 text-gray-600">
-            <p className="text-lg">لا توجد منشورات متاحة حالياً</p>
+            <p className="text-lg">تُعرض آخر الأخبار مباشرة على صفحة المؤسسة الرسمية في Facebook.</p>
           </div>
         )}
 
@@ -175,7 +160,7 @@ export default function FacebookFeed() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="https://www.facebook.com/61582145746691/"
+              href="https://www.facebook.com/Mashroana1"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50 transition-colors"

@@ -2,51 +2,22 @@ import { describe, it, expect } from "vitest";
 
 describe("Facebook Feed & SadaqahAdvisor Components", () => {
   describe("Facebook Feed", () => {
-    it("should have correct Facebook page URL", () => {
-      const facebookUrl = "https://www.facebook.com/61582145746691/";
+    it("should have the current official Facebook page URL", () => {
+      const facebookUrl = "https://www.facebook.com/Mashroana1";
       expect(facebookUrl).toContain("facebook.com");
-      expect(facebookUrl).toContain("61582145746691");
+      expect(facebookUrl).toContain("Mashroana1");
     });
 
-    it("should have mock posts with required fields", () => {
-      const mockPost = {
-        id: "1",
-        text: "منشور تجريبي",
-        image: "🎁",
-        likes: 100,
-        comments: 10,
-        shares: 5,
-        timestamp: "2026-04-24",
-        link: "https://facebook.com/post"
-      };
-
-      expect(mockPost).toHaveProperty("id");
-      expect(mockPost).toHaveProperty("text");
-      expect(mockPost).toHaveProperty("image");
-      expect(mockPost).toHaveProperty("likes");
-      expect(mockPost).toHaveProperty("comments");
-      expect(mockPost).toHaveProperty("shares");
-      expect(mockPost).toHaveProperty("timestamp");
-      expect(mockPost).toHaveProperty("link");
-    });
-
-    it("should have at least 5 mock posts", () => {
-      const mockPosts = [
-        { id: "1", text: "منشور 1", image: "🎁", likes: 100, comments: 10, shares: 5, timestamp: "2026-04-24", link: "link1" },
-        { id: "2", text: "منشور 2", image: "🌴", likes: 200, comments: 20, shares: 10, timestamp: "2026-04-23", link: "link2" },
-        { id: "3", text: "منشور 3", image: "⚕️", likes: 150, comments: 15, shares: 8, timestamp: "2026-04-22", link: "link3" },
-        { id: "4", text: "منشور 4", image: "👨‍👧‍👦", likes: 180, comments: 18, shares: 9, timestamp: "2026-04-21", link: "link4" },
-        { id: "5", text: "منشور 5", image: "❤️", likes: 250, comments: 25, shares: 12, timestamp: "2026-04-20", link: "link5" }
-      ];
-
-      expect(mockPosts.length).toBeGreaterThanOrEqual(5);
+    it("should not fabricate posts or engagement metrics", () => {
+      const postsFromWebsite: unknown[] = [];
+      expect(postsFromWebsite).toHaveLength(0);
     });
 
     it("should have correct contact links", () => {
       const contactLinks = {
         whatsapp: "https://wa.me/201013128453",
         telegram: "https://t.me/mashrouana",
-        facebook: "https://www.facebook.com/61582145746691/"
+        facebook: "https://www.facebook.com/Mashroana1"
       };
 
       expect(contactLinks.whatsapp).toContain("wa.me");

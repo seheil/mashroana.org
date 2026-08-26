@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { foundationData } from "@/../../shared/foundation-data";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { addContactMessage } from "@/lib/firestore-ops";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -21,12 +20,7 @@ export default function Contact() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const messagesRef = collection(db, "messages");
-      await addDoc(messagesRef, {
-        ...formData,
-        timestamp: serverTimestamp(),
-        read: false,
-      });
+      await addContactMessage(formData);
       setSubmitted(true);
       setTimeout(() => {
         setFormData({ name: "", email: "", phone: "", message: "" });
