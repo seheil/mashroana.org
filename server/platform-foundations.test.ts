@@ -310,4 +310,12 @@ describe("grant-ready platform foundations", () => {
     expect(advisor).toContain("getDonationAdvisorResponse");
     expect(advisor).toContain("أريد أن أتبرع بألف جنيه، كيف أقسمها؟");
   });
+
+  it("gives the donation assistant an accessible dialog, transcript and icon controls", () => {
+    const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
+    expect(advisor).toContain('role="dialog"');
+    expect(advisor).toContain('role="log"');
+    expect(advisor).toContain("فتح مساعد التبرع الذكي");
+    expect(advisor).toContain("إرسال السؤال إلى مساعد التبرع");
+  });
 });

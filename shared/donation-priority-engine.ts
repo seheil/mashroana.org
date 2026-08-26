@@ -80,10 +80,15 @@ export function parseArabicDonationAmount(input: string): number | null {
     const amount = Number(numericMatch[1]);
     return amount > 0 ? amount : null;
   }
-  if (/نصف\s+(?:ألف|الف)/i.test(normalizedDigits)) return 500;
-  if (/(?:ألفين|الفين)/i.test(normalizedDigits)) return 2000;
-  if (/(?:ثلاثة|٣)\s*(?:آلاف|الاف)/i.test(normalizedDigits)) return 3000;
-  if (/(?:ألف|الف)/i.test(normalizedDigits)) return 1000;
+  const words = normalizedDigits
+    .split(/[^\u0621-\u064A]+/)
+    .filter(Boolean)
+    .map((word) => word.replace(/^ب/, ""));
+  const hasWord = (...candidates: string[]) => words.some((word) => candidates.includes(word));
+  if (hasWord("نصف") && hasWord("ألف", "الف")) return 500;
+  if (hasWord("ألفين", "الفين")) return 2000;
+  if (hasWord("ثلاثة", "ثلاث") && hasWord("آلاف", "الاف")) return 3000;
+  if (hasWord("ألف", "الف")) return 1000;
   return null;
 }
 

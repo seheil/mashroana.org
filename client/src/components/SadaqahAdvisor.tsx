@@ -142,6 +142,8 @@ export function SadaqahAdvisor() {
             exit={{ scale: 0 }}
             onClick={() => setIsOpen(true)}
             className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full shadow-lg hover:shadow-xl z-40 flex items-center justify-center hover:scale-110 transition-transform"
+            type="button"
+            aria-label="فتح مساعد التبرع الذكي"
           >
             <MessageCircle size={28} />
           </motion.button>
@@ -161,6 +163,9 @@ export function SadaqahAdvisor() {
                 : "bottom-8 right-8 w-96 h-[600px] flex flex-col"
             }`}
             dir="rtl"
+            role="dialog"
+            aria-label="مساعد التبرع الذكي"
+            aria-modal="false"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-4 rounded-t-xl flex items-center justify-between">
@@ -175,6 +180,8 @@ export function SadaqahAdvisor() {
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="hover:bg-white/20 p-1 rounded transition"
+                  type="button"
+                  aria-label={isMinimized ? "توسيع نافذة مساعد التبرع" : "تصغير نافذة مساعد التبرع"}
                 >
                   {isMinimized ? (
                     <Maximize2 size={18} />
@@ -185,6 +192,8 @@ export function SadaqahAdvisor() {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="hover:bg-white/20 p-1 rounded transition"
+                  type="button"
+                  aria-label="إغلاق مساعد التبرع"
                 >
                   <X size={18} />
                 </button>
@@ -194,7 +203,7 @@ export function SadaqahAdvisor() {
             {!isMinimized && (
               <>
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" role="log" aria-live="polite" aria-relevant="additions text" aria-label="سجل محادثة مساعد التبرع">
                   {messages.map((message) => (
                     <motion.div
                       key={message.id}
@@ -277,16 +286,21 @@ export function SadaqahAdvisor() {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={(e) =>
+                    onKeyDown={(e) =>
                       e.key === "Enter" && handleSendMessage()
                     }
                     placeholder="اكتب رسالتك..."
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                    aria-label="اكتب سؤالك لمساعد التبرع"
+                    aria-describedby="advisor-input-help"
                   />
+                  <span id="advisor-input-help" className="sr-only">اكتب مبلغاً مثل ألف جنيه للحصول على تقسيم مقترح.</span>
                   <button
                     onClick={handleSendMessage}
                     disabled={isLoading}
                     className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
+                    type="button"
+                    aria-label="إرسال السؤال إلى مساعد التبرع"
                   >
                     <Send size={18} />
                   </button>

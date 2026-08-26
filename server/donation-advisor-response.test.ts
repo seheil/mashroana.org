@@ -24,4 +24,11 @@ describe("donation advisor responses", () => {
     expect(response).toContain("دعم علاجي معتمد");
     expect(response).toContain("دعم أسر");
   });
+
+  it("answers partnership, volunteering, privacy and media questions without inventing activity", () => {
+    expect(getDonationAdvisorResponse("كيف أقدم شراكة مع شركة؟", [])).toContain("نموذج «كن شريكاً»");
+    expect(getDonationAdvisorResponse("هل يوجد تطوع؟", [])).toContain("يمكنك التقدم من صفحة التطوع");
+    expect(getDonationAdvisorResponse("كيف تحمون بياناتي وخصوصيتي؟", [])).toContain("الحد الأدنى من البيانات");
+    expect(getDonationAdvisorResponse("أين مكتبة الصور والفيديو؟", [])).toContain("وافقت المؤسسة على نشرها فقط");
+  });
 });

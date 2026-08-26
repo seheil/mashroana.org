@@ -40,5 +40,6 @@ describe("donation priority engine", () => {
     expect(parseArabicDonationAmount("أريد التبرع بـ ١٠٠٠ جنيه")).toBe(1000);
     expect(parseArabicDonationAmount("أريد التبرع بنصف ألف")).toBe(500);
     expect(parseArabicDonationAmount("أريد التبرع اليوم")).toBeNull();
+    expect(parseArabicDonationAmount("أين مكتبة الفيديو؟")).toBeNull();
   });
 });
