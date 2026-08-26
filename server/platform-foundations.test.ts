@@ -327,6 +327,7 @@ describe("grant-ready platform foundations", () => {
     expect(studio).toContain("مركز إدارة المحتوى");
     expect(studio).toContain("فتح معاينة الموقع");
     expect(studio).toContain("أكملي عنوان ووصف وزر الواجهة الرئيسية قبل الحفظ");
+    expect(studio).toContain("صفحة عن المؤسسة");
   });
 
   it("binds the public homepage, navigation and footer to managed settings with defaults", () => {
@@ -339,6 +340,13 @@ describe("grant-ready platform foundations", () => {
     expect(navigation).toContain("navigation.items.filter");
     expect(footer).toContain("mergeNavigationContent(settings.navigation)");
     expect(footer).toContain("navigation.footerDescription");
+  });
+
+  it("binds the about-page message and work-area cards to the managed settings", () => {
+    const about = readProjectFile("client/src/pages/About.tsx");
+    expect(about).toContain("mergeAboutContent(settings.about)");
+    expect(about).toContain("about.workAreas.map");
+    expect(about).toContain("about.governanceTitle");
   });
 
   it("shows the assistant a proactive notice only when a published priority exists", () => {

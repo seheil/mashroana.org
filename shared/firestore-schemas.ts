@@ -53,6 +53,7 @@ export interface FirestoreSettings {
   partnershipsDueDiligence?: string;
   homepage?: FirestoreHomepageContent;
   navigation?: FirestoreNavigationContent;
+  about?: FirestoreAboutContent;
   updatedAt?: number;
 }
 
@@ -64,6 +65,11 @@ export interface FirestoreHeroContent {
   description?: string;
   primaryCtaLabel?: string;
   secondaryCtaLabel?: string;
+  sideLabel?: string;
+  sideTitle?: string;
+  sideDescription?: string;
+  sideCtaLabel?: string;
+  trustPoints?: string[];
 }
 
 export interface FirestoreHomepageSectionContent {
@@ -98,6 +104,26 @@ export interface FirestoreNavigationContent {
   donateLabel?: string;
   footerDescription?: string;
   items?: FirestoreNavigationItem[];
+}
+
+export interface FirestoreAboutWorkArea {
+  mark: string;
+  title: string;
+  text: string;
+}
+
+export interface FirestoreAboutContent {
+  tagline?: string;
+  workAreasHeading?: string;
+  workAreasDescription?: string;
+  workAreas?: FirestoreAboutWorkArea[];
+  governanceTitle?: string;
+  governanceDescription?: string;
+  boardIntro?: string;
+  institutionalContactTitle?: string;
+  institutionalContactDescription?: string;
+  partnershipCtaLabel?: string;
+  transparencyCtaLabel?: string;
 }
 
 export interface FirestoreContactMessage {
