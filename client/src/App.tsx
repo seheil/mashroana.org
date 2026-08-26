@@ -60,6 +60,18 @@ function RouteMetadata() {
     description.name = "description";
     description.content = metadata.description;
 
+    const setPropertyMeta = (property: string, content: string) => {
+      const meta = document.querySelector<HTMLMetaElement>(`meta[property="${property}"]`) ?? document.head.appendChild(document.createElement("meta"));
+      meta.setAttribute("property", property);
+      meta.content = content;
+    };
+
+    const setNamedMeta = (name: string, content: string) => {
+      const meta = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`) ?? document.head.appendChild(document.createElement("meta"));
+      meta.name = name;
+      meta.content = content;
+    };
+
     const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]') ?? document.head.appendChild(document.createElement("meta"));
     robots.name = "robots";
     robots.content = metadata.noindex ? "noindex, nofollow" : "index, follow";
@@ -67,6 +79,14 @@ function RouteMetadata() {
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]') ?? document.head.appendChild(document.createElement("link"));
     canonical.rel = "canonical";
     canonical.href = `${window.location.origin}${location === "/" ? "/" : location}`;
+
+    setPropertyMeta("og:title", metadata.title);
+    setPropertyMeta("og:description", metadata.description);
+    setPropertyMeta("og:type", "website");
+    setPropertyMeta("og:url", canonical.href);
+    setNamedMeta("twitter:card", "summary");
+    setNamedMeta("twitter:title", metadata.title);
+    setNamedMeta("twitter:description", metadata.description);
   }, [location]);
 
   return null;

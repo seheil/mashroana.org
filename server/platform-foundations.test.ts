@@ -228,4 +228,34 @@ describe("grant-ready platform foundations", () => {
     expect(media).toContain("إعادة المحاولة");
     expect(transparency).toContain("إعادة المحاولة");
   });
+
+  it("shows an Arabic recovery screen without exposing technical error details", () => {
+    const errorBoundary = readProjectFile("client/src/components/ErrorBoundary.tsx");
+    expect(errorBoundary).toContain("تعذر عرض هذه الصفحة الآن");
+    expect(errorBoundary).toContain("محاولة مرة أخرى");
+    expect(errorBoundary).toContain("إعادة تحميل الصفحة");
+    expect(errorBoundary).not.toContain("error?.stack");
+  });
+
+  it("provides page-specific metadata for shared public links", () => {
+    const app = readProjectFile("client/src/App.tsx");
+    expect(app).toContain('setPropertyMeta("og:title"');
+    expect(app).toContain('setPropertyMeta("og:description"');
+    expect(app).toContain('setNamedMeta("twitter:card"');
+    expect(app).toContain('setPropertyMeta("og:url"');
+  });
+
+  it("uses the active published domain in static discovery metadata until the official domain is connected", () => {
+    const indexHtml = readProjectFile("client/index.html");
+    expect(indexHtml).toContain("https://mashrouana-ne8hfedf.manus.space/");
+    expect(indexHtml).not.toContain("https://mashroana.org/");
+  });
+
+  it("offers Arabic recovery links on a missing route", () => {
+    const notFound = readProjectFile("client/src/pages/NotFound.tsx");
+    expect(notFound).toContain("الصفحة غير متاحة");
+    expect(notFound).toContain("العودة للرئيسية");
+    expect(notFound).toContain("المشاريع والبرامج");
+    expect(notFound).toContain("تواصل معنا");
+  });
 });
