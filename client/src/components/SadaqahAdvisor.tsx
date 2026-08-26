@@ -6,8 +6,11 @@ import {
   PROGRAMS,
   DONATION_METHODS,
   FAQ_ITEMS,
-  getIntelligentDonationRecommendation,
+  DONATION_ADVISOR_EXPERTISE,
 } from "@shared/foundation-knowledge";
+import { subscribeToDonationPriorities } from "@/lib/firestore-ops";
+import type { FirestoreDonationPriority } from "@shared/firestore-schemas";
+import { getDonationRecommendation, parseArabicDonationAmount } from "@shared/donation-priority-engine";
 
 // Re-export types for client usage
 export type { FoundationInfo, Program, DonationMethod, FAQ } from "@shared/foundation-knowledge";
@@ -20,10 +23,11 @@ interface Message {
 }
 
 const QUICK_QUESTIONS = [
+  "اقترح تقسيم 1000 جنيه",
+  "هل توجد أولوية دعم الآن؟",
   "ما هي مشاريع المؤسسة؟",
-  "كيف أتبرع بذكاء؟",
   "ما هي طرق التبرع؟",
-  "كيف أتواصل معكم؟",
+  "كيف أتواصل معكم؟"
 ];
 
 export function SadaqahAdvisor() {
@@ -37,18 +41,19 @@ export function SadaqahAdvisor() {
 أنا مساعد ${FOUNDATION_INFO.arabicName} الذكي.
 
 يسعدني مساعدتك في:
-✅ معرفة مشاريع المؤسسة
-✅ الحصول على إرشادات تبرع ذكية
-✅ معرفة طرق التبرع الآمنة
-✅ الإجابة على أسئلتك
+✅ معرفة برامج المؤسسة وطرق دعمها
+✅ اقتراح تقسيم دقيق للمبلغ الذي تكتبه
+✅ توضيح الأولويات المنشورة فقط، دون اختلاق حالة عاجلة
+✅ معرفة طرق التبرع الرسمية والتواصل الآمن
 
-كيف يمكنني مساعدتك اليوم؟`,
+مثال: «أريد أن أتبرع بألف جنيه، كيف أقسمها؟`,
       sender: "bot",
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [priorities, setPriorities] = useState<FirestoreDonationPriority[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -59,8 +64,55 @@ export function SadaqahAdvisor() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => subscribeToDonationPriorities(setPriorities, () => setPriorities([])), []);
+
+  const activePriorities = priorities.filter((priority) => priority.status === "published" && (!priority.endsAt || new Date(`${priority.endsAt}T23:59:59`).getTime() >= Date.now()));
+
   const generateBotResponse = (userMessage: string): string => {
     const lower = userMessage.toLowerCase();
+
+    const donationAmount = parseArabicDonationAmount(userMessage);
+    const asksForDonationPlan = /قسم|قسّم|وزع|وزّع|توزيع|مبلغ/.test(lower);
+    const mentionsDonation = /تبرع|اتبرع|دفع|جنيه|ألف|الف/.test(lower);
+
+    if (lower.includes("إيصال") || lower.includes("تأكيد التحويل") || lower.includes("تأكيد التبرع")) {
+      return "فتح رابط التبرع أو نسخ رقم التحويل لا يؤكد عملية تبرع. استخدم القناة الرسمية المناسبة، واحتفظ بالإيصال، ثم تواصل مع المؤسسة عبر WhatsApp أو الهاتف إذا احتجت متابعة أو توجيهاً.";
+    }
+
+    if (lower.includes("شفاف") || lower.includes("أين يذهب") || lower.includes("الثقة") || lower.includes("آمن")) {
+      return "نلتزم بأن تكون التوصية واضحة: عند وجود أولوية منشورة، أذكر سببها والمبلغ المقترح لكل بند. وعند عدم وجود أولوية معتمدة، أقول صراحة إن التوزيع متوازن وليس إعلاناً عن حالة عاجلة. استخدم القنوات الرسمية واحتفظ بالإيصال، ويمكنك زيارة مركز الشفافية ومنهجية الأثر في الموقع.";
+    }
+
+    if (lower.includes("ماذا تستطيع") || lower.includes("خبرة") || lower.includes("تساعدني")) {
+      return `أستطيع مساعدتك في:\n\n${DONATION_ADVISOR_EXPERTISE.map((item) => `• ${item}`).join("\n")}\n\nأرسل مبلغاً محدداً لأبدأ باقتراح عملي.`;
+    }
+
+    if (mentionsDonation && donationAmount) {
+      return getDonationRecommendation(donationAmount, activePriorities.map((priority) => ({
+        id: priority.id || priority.title,
+        title: priority.title,
+        description: priority.description,
+        programId: priority.programId,
+        programName: priority.programName,
+        kind: priority.kind,
+        status: priority.status,
+        recommendationWeight: priority.recommendationWeight,
+        reason: priority.reason,
+        sourceNote: priority.sourceNote,
+        publishedAt: priority.publishedAt,
+        endsAt: priority.endsAt ? new Date(`${priority.endsAt}T23:59:59`).getTime() : undefined,
+        updatedAt: priority.updatedAt,
+      }))).message;
+    }
+
+    if (lower.includes("أولوية") || lower.includes("عاجل") || lower.includes("مدارس") || lower.includes("حالة")) {
+      if (activePriorities.length === 0) return "لا توجد أولوية مؤقتة منشورة ومعتمدة الآن. هذا يعني أنني لن أصف أي برنامج بأنه أشد احتياجاً دون بيانات من الإدارة. أستطيع اقتراح توزيع متوازن إذا أرسلت مبلغ التبرع، مثل: «اقترح تقسيم 1000 جنيه».";
+      return `هذه أولويات منشورة ومعتمدة الآن:\n\n${activePriorities.slice(0, 3).map((priority) => `• ${priority.title}\n${priority.description}\nالسبب: ${priority.reason}`).join("\n\n")}\n\nأرسل مبلغك وسأقسمه بمبالغ دقيقة وفق هذه الأولويات.`;
+    }
+
+    if (asksForDonationPlan) {
+      return "أرسلي قيمة المبلغ لأقترح توزيعاً دقيقاً. مثال: «أريد أن أتبرع بألف جنيه» أو «اقترح تقسيم 500 جنيه». لن أصف أي حالة بأنها عاجلة إلا إذا كانت المؤسسة قد نشرتها واعتمدتها.";
+    }
 
     // الأسئلة عن المشاريع
     if (
@@ -73,27 +125,6 @@ export function SadaqahAdvisor() {
         response += `${p.icon} **${p.name}**\n${p.description}\n\n`;
       });
       return response;
-    }
-
-    // الأسئلة عن التبرع الذكي
-    if (
-      lower.includes("تبرع") &&
-      (lower.includes("جنيه") || lower.includes("كم"))
-    ) {
-      const amountMatch = userMessage.match(/(\d+)\s*جنيه/);
-      if (amountMatch) {
-        const amount = parseInt(amountMatch[1]);
-        const recommendation = getIntelligentDonationRecommendation(amount);
-        return recommendation.message;
-      }
-      return `يمكنك توزيع تبرعك بطريقة متوازنة:
-- 30% لكفالة الأيتام (احتياج مستمر)
-- 25% للدعم التعليمي
-- 20% للمساعدات الموسمية
-- 15% لمشغل الخياطة (صدقة جارية)
-- 10% لسقيا الماء والأشجار
-
-هذا يضمن أثراً متوازناً.`;
     }
 
     // الأسئلة عن طرق التبرع

@@ -38,6 +38,7 @@ import {
   subscribeToDocuments,
 } from "@/lib/firestore-ops";
 import { uploadMediaFile } from "@/lib/media-upload";
+import DonationPriorityManager from "@/components/DonationPriorityManager";
 import {
   FirestoreProject,
   FirestoreAchievement,
@@ -656,6 +657,7 @@ export default function AdminDashboard() {
             { id: "achievements", label: "🏆 الإنجازات" },
             { id: "media", label: "🖼️ مكتبة الوسائط" },
             { id: "tasks", label: "✓ المهام" },
+            { id: "priorities", label: "📣 أولويات التبرع" },
             { id: "documents", label: "📄 الوثائق" },
             { id: "messages", label: "💬 الرسائل" },
             { id: "inquiries", label: "🤝 الشراكات والتطوع" },
@@ -1266,6 +1268,8 @@ export default function AdminDashboard() {
             {loadingTasks ? <div className="rounded-xl bg-white py-10 text-center text-slate-500">جاري تحميل المهام...</div> : tasks.length === 0 ? <div className="rounded-xl border border-dashed border-slate-300 bg-white py-12 text-center text-slate-500">لا توجد مهام مسجلة بعد.</div> : <div className="space-y-3">{tasks.map((task) => <article key={task.id} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold text-slate-900">{task.title}</h3><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${task.status === "done" ? "bg-emerald-100 text-emerald-700" : task.status === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-700"}`}>{task.status === "done" ? "مكتملة" : task.status === "in_progress" ? "قيد التنفيذ" : "قيد البدء"}</span></div><p className="mt-1 text-sm text-slate-600">{task.description || "لا يوجد وصف إضافي."}</p><p className="mt-2 text-xs text-slate-500">{task.owner ? `المسؤول: ${task.owner}` : "غير مسندة"}{task.dueDate ? ` · الاستحقاق: ${task.dueDate}` : ""}</p></div><div className="flex gap-2"><Button variant="outline" onClick={() => { setEditingTaskId(task.id || null); setTaskDraft({ ...task, description: task.description || "", dueDate: task.dueDate || "", owner: task.owner || "", projectId: task.projectId || "" }); }}>تعديل</Button><Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50" onClick={() => task.id && handleDeleteTask(task.id)}>حذف</Button></div></article>)}</div>}
           </div>
         )}
+
+        {activeTab === "priorities" && <DonationPriorityManager projects={projects} />}
 
         {/* DOCUMENTS TAB */}
         {activeTab === "documents" && (

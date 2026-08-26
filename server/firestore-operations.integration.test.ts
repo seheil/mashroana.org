@@ -29,6 +29,10 @@ import {
   deleteDocument,
   updateSettings,
   subscribeToProjects,
+  addDonationPriority,
+  updateDonationPriority,
+  deleteDonationPriority,
+  subscribeToDonationPriorities,
 } from "../client/src/lib/firestore-ops";
 
 describe("عمليات Firestore الإدارية", () => {
@@ -143,6 +147,49 @@ describe("عمليات Firestore الإدارية", () => {
     const onError = vi.fn();
     const result = subscribeToProjects(callback, onError);
     expect(callback).toHaveBeenCalledWith([expect.objectContaining({ id: "project-1", name: "برنامج حي" })]);
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: "permission-denied" }));
+    expect(result).toBe(unsubscribe);
+  });
+
+  it("ينشئ ويحدث ويحذف أولوية تبرع معتمدة دون اختلاق بيانات", async () => {
+    const priority = {
+      title: "أولوية مدرسية معتمدة",
+      description: "وصف صادر من المؤسسة",
+      programId: "education-support",
+      programName: "الدعم التعليمي",
+      kind: "seasonal" as const,
+      status: "draft" as const,
+      recommendationWeight: 50,
+      reason: "احتياج راجعته الإدارة.",
+      sourceNote: "سجل متابعة داخلي",
+    };
+    await addDonationPriority(priority);
+    expect(firestore.addDoc).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "donationPriorities" }),
+      expect.objectContaining({ ...priority, createdAt: "SERVER_TIMESTAMP", updatedAt: "SERVER_TIMESTAMP" })
+    );
+
+    await updateDonationPriority("priority-1", { status: "published", recommendationWeight: 60 });
+    expect(firestore.updateDoc).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "donationPriorities", id: "priority-1" }),
+      expect.objectContaining({ status: "published", recommendationWeight: 60, updatedAt: "SERVER_TIMESTAMP" })
+    );
+
+    await deleteDonationPriority("priority-1");
+    expect(firestore.deleteDoc).toHaveBeenCalledWith(expect.objectContaining({ name: "donationPriorities", id: "priority-1" }));
+  });
+
+  it("يمرر الأولويات للمستمع الحي ويعيد خطأ Firestore للمستدعي", () => {
+    const unsubscribe = vi.fn();
+    firestore.onSnapshot.mockImplementation((_reference: unknown, onNext: Function, onError: Function) => {
+      onNext({ docs: [{ id: "priority-1", data: () => ({ title: "أولوية", status: "published", recommendationWeight: 50 }) }] });
+      onError(new Error("permission-denied"));
+      return unsubscribe;
+    });
+    const callback = vi.fn();
+    const onError = vi.fn();
+    const result = subscribeToDonationPriorities(callback, onError);
+    expect(callback).toHaveBeenCalledWith([expect.objectContaining({ id: "priority-1", status: "published" })]);
     expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: "permission-denied" }));
     expect(result).toBe(unsubscribe);
   });

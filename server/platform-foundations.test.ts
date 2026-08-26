@@ -277,4 +277,33 @@ describe("grant-ready platform foundations", () => {
     expect(footer).toContain("صفحة المؤسسة على فيسبوك");
     expect(footer).toContain("قناة المؤسسة على تيليجرام");
   });
+
+  it("keeps donation priorities administratively managed and blocks placeholder publication", () => {
+    const manager = readProjectFile("client/src/components/DonationPriorityManager.tsx");
+    const admin = readProjectFile("client/src/pages/AdminDashboard.tsx");
+    expect(manager).toContain("مصدر التحقق الداخلي");
+    expect(manager).toContain("لا تنشري حالة عاجلة");
+    expect(manager).toContain("status: \"draft\"");
+    expect(admin).toContain("أولويات التبرع");
+  });
+
+  it("connects the public assistant and homepage only to published donation priorities", () => {
+    const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
+    const notice = readProjectFile("client/src/components/DonationPriorityNotice.tsx");
+    const home = readProjectFile("client/src/pages/Home.tsx");
+    expect(advisor).toContain("parseArabicDonationAmount");
+    expect(advisor).toContain("status === \"published\"");
+    expect(advisor).toContain("اقترح تقسيم 1000 جنيه");
+    expect(notice).toContain("لا تُعرض أي حالة عند عدم وجود أولوية موثقة");
+    expect(home).toContain("DonationPriorityNotice");
+  });
+
+  it("documents transparent assistant expertise around exact allocations and donation confirmation", () => {
+    const knowledge = readProjectFile("shared/foundation-knowledge.ts");
+    const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
+    expect(knowledge).toContain("DONATION_ADVISOR_EXPERTISE");
+    expect(knowledge).toContain("لا يؤكد التحويل المالي");
+    expect(advisor).toContain("فتح رابط التبرع أو نسخ رقم التحويل لا يؤكد");
+    expect(advisor).toContain("أريد أن أتبرع بألف جنيه، كيف أقسمها؟");
+  });
 });

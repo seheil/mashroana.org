@@ -147,6 +147,33 @@ export interface FirestoreDocument {
   updatedAt?: number;
 }
 
+export type DonationPriorityKind = "urgent" | "seasonal" | "program";
+export type DonationPriorityStatus = "draft" | "published" | "closed";
+
+/**
+ * A staff-approved, time-bound need that may be shown publicly and used by the donation assistant.
+ * It must not be created with placeholder urgency or beneficiary claims.
+ */
+export interface FirestoreDonationPriority {
+  id?: string;
+  title: string;
+  description: string;
+  programId: string;
+  programName: string;
+  kind: DonationPriorityKind;
+  status: DonationPriorityStatus;
+  recommendationWeight: number;
+  reason: string;
+  sourceNote: string;
+  targetAmount?: number;
+  beneficiaryCount?: number;
+  beneficiaryLabel?: string;
+  publishedAt?: number;
+  endsAt?: string;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
 /**
  * Collection names for Firestore
  */
@@ -160,6 +187,7 @@ export const FIRESTORE_COLLECTIONS = {
   MEDIA: "media",
   TASKS: "tasks",
   DOCUMENTS: "documents",
+  DONATION_PRIORITIES: "donationPriorities",
 } as const;
 
 /**

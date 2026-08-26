@@ -26,6 +26,7 @@ import {
   FirestoreMediaItem,
   FirestoreTask,
   FirestoreDocument,
+  FirestoreDonationPriority,
   FIRESTORE_COLLECTIONS,
   DEFAULT_SETTINGS_ID,
 } from "@shared/firestore-schemas";
@@ -508,6 +509,59 @@ export function subscribeToDocuments(
         (documentDoc) => ({ id: documentDoc.id, ...documentDoc.data() } as FirestoreDocument)
       );
       callback(documents);
+    },
+    (error) => onError?.(error)
+  );
+}
+
+// ============================================================================
+// DONATION PRIORITIES AND VERIFIED NEED NOTICES
+// ============================================================================
+
+export async function addDonationPriority(
+  priority: Omit<FirestoreDonationPriority, "id" | "createdAt" | "updatedAt">
+) {
+  const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES), {
+    ...priority,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return { id: docRef.id, ...priority };
+}
+
+export async function updateDonationPriority(id: string, updates: Partial<FirestoreDonationPriority>) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES, id), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+  return { id, ...updates };
+}
+
+export async function deleteDonationPriority(id: string) {
+  await deleteDoc(doc(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES, id));
+  return id;
+}
+
+function priorityTime(value: unknown) {
+  if (typeof value === "number") return value;
+  if (value && typeof (value as { toMillis?: () => number }).toMillis === "function") {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  if (typeof value === "string") return Date.parse(value) || 0;
+  return 0;
+}
+
+export function subscribeToDonationPriorities(
+  callback: (priorities: FirestoreDonationPriority[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES),
+    (snapshot) => {
+      const priorities = snapshot.docs
+        .map((priorityDoc) => ({ id: priorityDoc.id, ...priorityDoc.data() } as FirestoreDonationPriority))
+        .sort((first, second) => priorityTime(second.updatedAt || second.createdAt) - priorityTime(first.updatedAt || first.createdAt));
+      callback(priorities);
     },
     (error) => onError?.(error)
   );
