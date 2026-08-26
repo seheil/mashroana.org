@@ -3,14 +3,10 @@ import { MessageCircle, Send, X, Minimize2, Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FOUNDATION_INFO,
-  PROGRAMS,
-  DONATION_METHODS,
-  FAQ_ITEMS,
-  DONATION_ADVISOR_EXPERTISE,
 } from "@shared/foundation-knowledge";
 import { subscribeToPublishedDonationPriorities } from "@/lib/firestore-ops";
 import type { FirestoreDonationPriority } from "@shared/firestore-schemas";
-import { getDonationRecommendation, parseArabicDonationAmount } from "@shared/donation-priority-engine";
+import { getDonationAdvisorResponse } from "@shared/donation-advisor-response";
 
 // Re-export types for client usage
 export type { FoundationInfo, Program, DonationMethod, FAQ } from "@shared/foundation-knowledge";
@@ -69,26 +65,7 @@ export function SadaqahAdvisor() {
   const activePriorities = priorities.filter((priority) => priority.status === "published" && (!priority.endsAt || new Date(`${priority.endsAt}T23:59:59`).getTime() >= Date.now()));
 
   const generateBotResponse = (userMessage: string): string => {
-    const lower = userMessage.toLowerCase();
-
-    const donationAmount = parseArabicDonationAmount(userMessage);
-    const asksForDonationPlan = /قسم|قسّم|وزع|وزّع|توزيع|مبلغ/.test(lower);
-    const mentionsDonation = /تبرع|اتبرع|دفع|جنيه|ألف|الف/.test(lower);
-
-    if (lower.includes("إيصال") || lower.includes("تأكيد التحويل") || lower.includes("تأكيد التبرع")) {
-      return "فتح رابط التبرع أو نسخ رقم التحويل لا يؤكد عملية تبرع. استخدم القناة الرسمية المناسبة، واحتفظ بالإيصال، ثم تواصل مع المؤسسة عبر WhatsApp أو الهاتف إذا احتجت متابعة أو توجيهاً.";
-    }
-
-    if (lower.includes("شفاف") || lower.includes("أين يذهب") || lower.includes("الثقة") || lower.includes("آمن")) {
-      return "نلتزم بأن تكون التوصية واضحة: عند وجود أولوية منشورة، أذكر سببها والمبلغ المقترح لكل بند. وعند عدم وجود أولوية معتمدة، أقول صراحة إن التوزيع متوازن وليس إعلاناً عن حالة عاجلة. استخدم القنوات الرسمية واحتفظ بالإيصال، ويمكنك زيارة مركز الشفافية ومنهجية الأثر في الموقع.";
-    }
-
-    if (lower.includes("ماذا تستطيع") || lower.includes("خبرة") || lower.includes("تساعدني")) {
-      return `أستطيع مساعدتك في:\n\n${DONATION_ADVISOR_EXPERTISE.map((item) => `• ${item}`).join("\n")}\n\nأرسل مبلغاً محدداً لأبدأ باقتراح عملي.`;
-    }
-
-    if (mentionsDonation && donationAmount) {
-      return getDonationRecommendation(donationAmount, activePriorities.map((priority) => ({
+    return getDonationAdvisorResponse(userMessage, activePriorities.map((priority) => ({
         id: priority.id || priority.title,
         title: priority.title,
         description: priority.description,
@@ -102,70 +79,7 @@ export function SadaqahAdvisor() {
         publishedAt: priority.publishedAt,
         endsAt: priority.endsAt ? new Date(`${priority.endsAt}T23:59:59`).getTime() : undefined,
         updatedAt: priority.updatedAt,
-      }))).message;
-    }
-
-    if (lower.includes("أولوية") || lower.includes("عاجل") || lower.includes("مدارس") || lower.includes("حالة")) {
-      if (activePriorities.length === 0) return "لا توجد أولوية مؤقتة منشورة ومعتمدة الآن. هذا يعني أنني لن أصف أي برنامج بأنه أشد احتياجاً دون بيانات من الإدارة. أستطيع اقتراح توزيع متوازن إذا أرسلت مبلغ التبرع، مثل: «اقترح تقسيم 1000 جنيه».";
-      return `هذه أولويات منشورة ومعتمدة الآن:\n\n${activePriorities.slice(0, 3).map((priority) => `• ${priority.title}\n${priority.description}\nالسبب: ${priority.reason}`).join("\n\n")}\n\nأرسل مبلغك وسأقسمه بمبالغ دقيقة وفق هذه الأولويات.`;
-    }
-
-    if (asksForDonationPlan) {
-      return "أرسلي قيمة المبلغ لأقترح توزيعاً دقيقاً. مثال: «أريد أن أتبرع بألف جنيه» أو «اقترح تقسيم 500 جنيه». لن أصف أي حالة بأنها عاجلة إلا إذا كانت المؤسسة قد نشرتها واعتمدتها.";
-    }
-
-    // الأسئلة عن المشاريع
-    if (
-      lower.includes("مشروع") ||
-      lower.includes("برنامج") ||
-      lower.includes("أنشطة")
-    ) {
-      let response = "مشاريع المؤسسة (9 مجالات خيرية):\n\n";
-      PROGRAMS.forEach((p: any) => {
-        response += `${p.icon} **${p.name}**\n${p.description}\n\n`;
-      });
-      return response;
-    }
-
-    // الأسئلة عن طرق التبرع
-    if (lower.includes("تبرع") || lower.includes("دفع")) {
-      let response = "طرق التبرع الآمنة:\n\n";
-      DONATION_METHODS.forEach((m: any) => {
-        response += `💳 ${m.name}\n${m.details}\n\n`;
-      });
-      response += `\n${DONATION_METHODS[0].trustMessage}`;
-      return response;
-    }
-
-    // الأسئلة عن التواصل
-    if (lower.includes("تواصل") || lower.includes("اتصال")) {
-      return `يمكنك التواصل معنا عبر:
-
-📍 العنوان: ${FOUNDATION_INFO.address}
-📱 الهاتف/WhatsApp: ${FOUNDATION_INFO.phone}
-💬 Telegram: ${FOUNDATION_INFO.telegram}
-🌐 الموقع: ${FOUNDATION_INFO.website}
-
-نحن هنا لمساعدتك!`;
-    }
-
-    // الأسئلة الشائعة
-    const faq = FAQ_ITEMS.find((f: any) =>
-      f.question.toLowerCase().includes(lower.split(" ")[0])
-    );
-    if (faq) {
-      return faq.answer;
-    }
-
-    // الرد العام
-    return `شكراً على سؤالك! 😊
-
-يمكنك:
-• اختيار مشروع خيري
-• التبرع مباشرة
-• التواصل معنا
-
-كيف يمكنني مساعدتك بشكل أكثر تحديداً؟`;
+      })));
   };
 
   const handleSendMessage = async () => {

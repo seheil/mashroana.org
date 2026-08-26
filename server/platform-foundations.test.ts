@@ -291,7 +291,8 @@ describe("grant-ready platform foundations", () => {
     const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
     const notice = readProjectFile("client/src/components/DonationPriorityNotice.tsx");
     const home = readProjectFile("client/src/pages/Home.tsx");
-    expect(advisor).toContain("parseArabicDonationAmount");
+    const responses = readProjectFile("shared/donation-advisor-response.ts");
+    expect(responses).toContain("parseArabicDonationAmount");
     expect(advisor).toContain("status === \"published\"");
     expect(advisor).toContain("subscribeToPublishedDonationPriorities");
     expect(advisor).toContain("اقترح تقسيم 1000 جنيه");
@@ -302,9 +303,11 @@ describe("grant-ready platform foundations", () => {
   it("documents transparent assistant expertise around exact allocations and donation confirmation", () => {
     const knowledge = readProjectFile("shared/foundation-knowledge.ts");
     const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
+    const responses = readProjectFile("shared/donation-advisor-response.ts");
     expect(knowledge).toContain("DONATION_ADVISOR_EXPERTISE");
     expect(knowledge).toContain("لا يؤكد التحويل المالي");
-    expect(advisor).toContain("فتح رابط التبرع أو نسخ رقم التحويل لا يؤكد");
+    expect(responses).toContain("فتح رابط التبرع أو نسخ رقم التحويل لا يؤكد");
+    expect(advisor).toContain("getDonationAdvisorResponse");
     expect(advisor).toContain("أريد أن أتبرع بألف جنيه، كيف أقسمها؟");
   });
 });
