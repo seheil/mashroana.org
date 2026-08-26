@@ -31,6 +31,8 @@ describe("grant-ready platform foundations", () => {
     expect(appSource).toContain('<Route path={"/gallery"} component={MediaLibrary} />');
     expect(appSource).toContain('<Route path={"/media"} component={MediaLibrary} />');
     expect(mediaLibrary).toContain("subscribeToMediaItems");
+    expect(mediaLibrary).toContain("subscribeToSettings");
+    expect(mediaLibrary).toContain("settings.mediaHeadline");
     expect(mediaLibrary).toContain('item.status === "published"');
   });
 
@@ -347,6 +349,15 @@ describe("grant-ready platform foundations", () => {
     expect(about).toContain("mergeAboutContent(settings.about)");
     expect(about).toContain("about.workAreas.map");
     expect(about).toContain("about.governanceTitle");
+  });
+
+  it("keeps media and public-document headings editable without bypassing publication controls", () => {
+    const media = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    const transparency = readProjectFile("client/src/pages/Transparency.tsx");
+    expect(media).toContain("settings.mediaHeadline");
+    expect(media).toContain("settings.mediaDescription");
+    expect(transparency).toContain("settings.transparencyDocumentsTitle");
+    expect(transparency).toContain("documentItem.documentUrl");
   });
 
   it("shows the assistant a proactive notice only when a published priority exists", () => {

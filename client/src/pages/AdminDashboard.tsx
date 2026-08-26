@@ -56,12 +56,15 @@ const institutionalContentFields = [
   { key: "aboutCommitments", label: "التزام المؤسسة العلني" },
   { key: "transparencyGovernance", label: "وصف الحوكمة" },
   { key: "transparencyImpact", label: "وصف قياس الأثر" },
+  { key: "transparencyDocumentsTitle", label: "عنوان قسم الوثائق العامة" },
   { key: "transparencyDocuments", label: "وصف الوثائق والتقارير" },
   { key: "partnershipsWhy", label: "فقرة لماذا الشراكة معنا؟" },
   { key: "partnershipsPrograms", label: "وصف البرامج القابلة للتخصيص" },
   { key: "partnershipsImpact", label: "وصف مؤشرات الأثر للشراكات" },
   { key: "partnershipsMedia", label: "وصف الإعلام المسؤول" },
   { key: "partnershipsDueDiligence", label: "وصف حزمة العناية الواجبة" },
+  { key: "mediaHeadline", label: "عنوان صفحة المكتبة الإعلامية" },
+  { key: "mediaDescription", label: "وصف صفحة المكتبة الإعلامية" },
 ] as const;
 
 export default function AdminDashboard() {

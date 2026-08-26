@@ -43,6 +43,7 @@ export interface FirestoreSettings {
   transparencyDescription?: string;
   transparencyGovernance?: string;
   transparencyImpact?: string;
+  transparencyDocumentsTitle?: string;
   transparencyDocuments?: string;
   partnershipsHeadline?: string;
   partnershipsDescription?: string;
@@ -51,6 +52,8 @@ export interface FirestoreSettings {
   partnershipsImpact?: string;
   partnershipsMedia?: string;
   partnershipsDueDiligence?: string;
+  mediaHeadline?: string;
+  mediaDescription?: string;
   homepage?: FirestoreHomepageContent;
   navigation?: FirestoreNavigationContent;
   about?: FirestoreAboutContent;

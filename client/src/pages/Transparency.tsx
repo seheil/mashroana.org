@@ -82,7 +82,7 @@ export default function Transparency() {
         </section>
 
         <section>
-          <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between"><div><h2 className="text-3xl font-black">الوثائق المنشورة</h2><p className="mt-2 text-slate-600">تُحدّث الوثائق من لوحة الإدارة بعد المراجعة والموافقة على النشر.</p></div><Link href="/partnerships" className="font-bold text-emerald-800 hover:underline">طلب معلومات شراكة ←</Link></div>
+          <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between"><div><h2 className="text-3xl font-black">{settings.transparencyDocumentsTitle || "الوثائق المنشورة"}</h2><p className="mt-2 text-slate-600">تُحدّث الوثائق من لوحة الإدارة بعد المراجعة والموافقة على النشر.</p></div><Link href="/partnerships" className="font-bold text-emerald-800 hover:underline">طلب معلومات شراكة ←</Link></div>
           {loading && <div className="py-14 text-center text-slate-500" role="status">جاري تحميل الوثائق...</div>}
           {!loading && error && <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-900" role="status"><p>{error}</p><button type="button" onClick={retryLoad} className="mt-4 rounded-lg border border-amber-400 px-4 py-2 font-bold hover:bg-amber-100">إعادة المحاولة</button></div>}
           {!loading && !error && documents.length === 0 && <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center"><h3 className="font-bold">لا توجد وثائق منشورة حالياً</h3><p className="mx-auto mt-2 max-w-xl leading-7 text-slate-600">سيتم نشر الوثائق التي تعتمد المؤسسة مشاركتها هنا تباعاً. يمكن للشركاء التواصل لطلب حزمة العناية الواجبة المناسبة.</p></div>}

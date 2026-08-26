@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
-import { subscribeToMediaItems } from "@/lib/firestore-ops";
-import type { FirestoreMediaItem } from "@shared/firestore-schemas";
+import { subscribeToMediaItems, subscribeToSettings } from "@/lib/firestore-ops";
+import type { FirestoreMediaItem, FirestoreSettings } from "@shared/firestore-schemas";
 
 export default function MediaLibrary() {
   const [items, setItems] = useState<FirestoreMediaItem[]>([]);
@@ -10,6 +10,7 @@ export default function MediaLibrary() {
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [category, setCategory] = useState("all");
   const [activeItem, setActiveItem] = useState<FirestoreMediaItem | null>(null);
+  const [settings, setSettings] = useState<FirestoreSettings>({ orphans: 0, students: 0, patients: 0, families: 0 });
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -45,6 +46,8 @@ export default function MediaLibrary() {
       unsubscribe();
     };
   }, [loadAttempt]);
+
+  useEffect(() => subscribeToSettings(setSettings), []);
 
   const categories = useMemo(
     () => ["all", ...Array.from(new Set(items.map((item) => item.category).filter(Boolean)))],
@@ -87,9 +90,9 @@ export default function MediaLibrary() {
         <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-amber-200/10 blur-3xl" />
         <div className="relative mx-auto max-w-6xl">
           <p className="mb-3 text-sm font-bold tracking-[0.16em] text-emerald-200">من أرض الواقع</p>
-          <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-6xl">مكتبة الأثر المرئي</h1>
+          <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-6xl">{settings.mediaHeadline || "مكتبة الأثر المرئي"}</h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-emerald-50/90">
-            صور وفيديوهات موثقة من برامج المؤسسة، تُعرض مع وصف وسياق يحترم خصوصية المستفيدين وحقوق النشر.
+            {settings.mediaDescription || "صور وفيديوهات موثقة من برامج المؤسسة، تُعرض مع وصف وسياق يحترم خصوصية المستفيدين وحقوق النشر."}
           </p>
           <Link href="/media-kit" className="mt-6 inline-block rounded-xl border border-white/40 px-4 py-2.5 font-bold text-white hover:bg-white/10">الحزمة الإعلامية وسياسة الاستخدام</Link>
         </div>
