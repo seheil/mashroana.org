@@ -318,4 +318,11 @@ describe("grant-ready platform foundations", () => {
     expect(advisor).toContain("فتح مساعد التبرع الذكي");
     expect(advisor).toContain("إرسال السؤال إلى مساعد التبرع");
   });
+
+  it("shows the assistant a proactive notice only when a published priority exists", () => {
+    const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
+    expect(advisor).toContain("activePriorities.length > 0");
+    expect(advisor).toContain("أولوية دعم منشورة الآن");
+    expect(advisor).toContain("ما هي أولويات الدعم الحالية؟");
+  });
 });
