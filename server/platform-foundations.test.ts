@@ -162,4 +162,16 @@ describe("grant-ready platform foundations", () => {
     expect(partnerBrief).toContain("ما لا يفترضه هذا الموجز");
     expect(partnerships).toContain("عرض الموجز العربي");
   });
+
+  it("prevents indefinite public loading states when Firestore does not answer", () => {
+    const projects = readProjectFile("client/src/pages/Projects.tsx");
+    const media = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    const transparency = readProjectFile("client/src/pages/Transparency.tsx");
+    expect(projects).toContain("6000");
+    expect(media).toContain("6000");
+    expect(transparency).toContain("6000");
+    expect(projects).toContain("لم تتوفر بيانات المشاريع في الوقت الحالي");
+    expect(media).toContain("لا نعرض صوراً تجريبية");
+    expect(transparency).toContain("لا توجد وثائق منشورة متاحة للعرض");
+  });
 });

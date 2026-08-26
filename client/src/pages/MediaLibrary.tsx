@@ -19,17 +19,30 @@ export default function MediaLibrary() {
   }, []);
 
   useEffect(() => {
+    let resolved = false;
+    const timeoutId = window.setTimeout(() => {
+      if (resolved) return;
+      setError("لم تتوفر مواد منشورة للعرض في الوقت الحالي. لا نعرض صوراً تجريبية؛ ويمكنكم التواصل مع المؤسسة لطلب معلومات معتمدة.");
+      setLoading(false);
+    }, 6000);
     const unsubscribe = subscribeToMediaItems(
       (nextItems) => {
+        resolved = true;
+        window.clearTimeout(timeoutId);
         setItems(nextItems.filter((item) => item.status === "published"));
         setLoading(false);
       },
       () => {
-        setError("تعذر تحميل المكتبة حالياً. يرجى المحاولة لاحقاً.");
+        resolved = true;
+        window.clearTimeout(timeoutId);
+        setError("لم تتوفر مواد منشورة للعرض في الوقت الحالي. لا نعرض صوراً تجريبية؛ ويمكنكم التواصل مع المؤسسة لطلب معلومات معتمدة.");
         setLoading(false);
       }
     );
-    return unsubscribe;
+    return () => {
+      window.clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, []);
 
   const categories = useMemo(
@@ -96,7 +109,7 @@ export default function MediaLibrary() {
         </div>
 
         {loading && <div className="rounded-2xl bg-white py-16 text-center text-slate-500 shadow-sm">جاري تحميل مكتبة الأثر...</div>}
-        {!loading && error && <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-800">{error}</div>}
+        {!loading && error && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-amber-900" role="status">{error}</div>}
         {!loading && !error && visibleItems.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
             <h2 className="text-xl font-bold">ستتوفر مواد موثقة قريباً</h2>

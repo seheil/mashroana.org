@@ -12,23 +12,36 @@ export default function Projects() {
   useEffect(() => {
     setLoading(true);
     setError(null);
+    let resolved = false;
+    const timeoutId = window.setTimeout(() => {
+      if (resolved) return;
+      setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
+      setLoading(false);
+    }, 6000);
 
     try {
       const unsubscribe = subscribeToProjects((projectsList) => {
+        resolved = true;
+        window.clearTimeout(timeoutId);
         setProjects(projectsList);
         setLoading(false);
         setError(null);
       }, () => {
-        setError("حدث خطأ في تحميل المشاريع. يرجى المحاولة لاحقاً.");
+        resolved = true;
+        window.clearTimeout(timeoutId);
+        setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
         setLoading(false);
       });
 
       return () => {
+        window.clearTimeout(timeoutId);
         if (unsubscribe) unsubscribe();
       };
     } catch (err) {
       console.error("Error loading projects:", err);
-      setError("حدث خطأ في تحميل المشاريع. يرجى المحاولة لاحقاً.");
+      resolved = true;
+      window.clearTimeout(timeoutId);
+      setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
       setLoading(false);
     }
   }, []);
@@ -55,7 +68,7 @@ export default function Projects() {
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-8">
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded mb-8" role="status">
             {error}
           </div>
         )}
