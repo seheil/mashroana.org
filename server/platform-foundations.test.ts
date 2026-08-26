@@ -174,4 +174,13 @@ describe("grant-ready platform foundations", () => {
     expect(media).toContain("لا نعرض صوراً تجريبية");
     expect(transparency).toContain("لا توجد وثائق منشورة متاحة للعرض");
   });
+
+  it("keeps the donation flow honest and accessible without implying an automatic payment confirmation", () => {
+    const donationModal = readProjectFile("client/src/components/DonationModal.tsx");
+    expect(donationModal).toContain('role="dialog"');
+    expect(donationModal).toContain('event.key === \'Escape\'');
+    expect(donationModal).toContain("احتفظ بإيصال التحويل");
+    expect(donationModal).not.toContain("سيتم تأكيد تبرعك فوراً");
+    expect(donationModal).toContain('aria-live="polite"');
+  });
 });
