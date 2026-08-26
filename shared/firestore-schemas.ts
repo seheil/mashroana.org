@@ -51,7 +51,53 @@ export interface FirestoreSettings {
   partnershipsImpact?: string;
   partnershipsMedia?: string;
   partnershipsDueDiligence?: string;
+  homepage?: FirestoreHomepageContent;
+  navigation?: FirestoreNavigationContent;
   updatedAt?: number;
+}
+
+export type HomepageSectionId = "impact" | "priorities" | "programs" | "partnerships" | "media" | "donate";
+
+export interface FirestoreHeroContent {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
+}
+
+export interface FirestoreHomepageSectionContent {
+  enabled?: boolean;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  ctaLabel?: string;
+}
+
+export interface FirestoreHomepageContent {
+  hero?: FirestoreHeroContent;
+  impact?: FirestoreHomepageSectionContent;
+  priorities?: FirestoreHomepageSectionContent;
+  programs?: FirestoreHomepageSectionContent;
+  partnerships?: FirestoreHomepageSectionContent;
+  media?: FirestoreHomepageSectionContent;
+  donate?: FirestoreHomepageSectionContent;
+  sectionOrder?: HomepageSectionId[];
+}
+
+export interface FirestoreNavigationItem {
+  id: string;
+  label: string;
+  href: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface FirestoreNavigationContent {
+  brandShortName?: string;
+  donateLabel?: string;
+  footerDescription?: string;
+  items?: FirestoreNavigationItem[];
 }
 
 export interface FirestoreContactMessage {

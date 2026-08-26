@@ -1,7 +1,14 @@
 import { Link } from "wouter";
+import { useEffect, useState } from "react";
 import { foundationData } from "@/../../shared/foundation-data";
+import { subscribeToSettings } from "@/lib/firestore-ops";
+import { mergeNavigationContent } from "@shared/content-studio-defaults";
 
 export default function Footer() {
+  const [navigation, setNavigation] = useState(() => mergeNavigationContent());
+
+  useEffect(() => subscribeToSettings((settings) => setNavigation(mergeNavigationContent(settings.navigation))), []);
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -10,8 +17,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">عن المؤسسة</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              مؤسسة مشروعنا إلى الجنة تعمل على نشر الخير والعطف في المجتمع من خلال
-              مشاريع خيرية متنوعة.
+              {navigation.footerDescription}
             </p>
           </div>
 
@@ -19,36 +25,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">روابط سريعة</h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/" className="text-gray-400 hover:text-white">
-                  الرئيسية
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-400 hover:text-white">
-                  عن المؤسسة
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white">
-                  تواصل معنا
-                </Link>
-              </li>
-              <li>
-                <Link href="/media" className="text-gray-400 hover:text-white">
-                  مكتبة الوسائط
-                </Link>
-              </li>
-              <li>
-                <Link href="/transparency" className="text-gray-400 hover:text-white">
-                  الشفافية والحوكمة
-                </Link>
-              </li>
-              <li>
-                <Link href="/partnerships" className="text-gray-400 hover:text-white">
-                  الشراكات والمنح
-                </Link>
-              </li>
+              {navigation.items.filter((item) => item.enabled).map((item) => <li key={item.id}><Link href={item.href} className="text-gray-400 hover:text-white">{item.label}</Link></li>)}
               <li>
                 <Link href="/privacy" className="text-gray-400 hover:text-white">
                   سياسة الخصوصية

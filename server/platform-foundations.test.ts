@@ -319,6 +319,28 @@ describe("grant-ready platform foundations", () => {
     expect(advisor).toContain("إرسال السؤال إلى مساعد التبرع");
   });
 
+  it("adds a guided content studio to the existing Firestore admin dashboard", () => {
+    const admin = readProjectFile("client/src/pages/AdminDashboard.tsx");
+    const studio = readProjectFile("client/src/components/ContentStudioManager.tsx");
+    expect(admin).toContain("ContentStudioManager");
+    expect(admin).toContain("الواجهة والأقسام");
+    expect(studio).toContain("مركز إدارة المحتوى");
+    expect(studio).toContain("فتح معاينة الموقع");
+    expect(studio).toContain("أكملي عنوان ووصف وزر الواجهة الرئيسية قبل الحفظ");
+  });
+
+  it("binds the public homepage, navigation and footer to managed settings with defaults", () => {
+    const home = readProjectFile("client/src/pages/Home.tsx");
+    const navigation = readProjectFile("client/src/components/Navigation.tsx");
+    const footer = readProjectFile("client/src/components/Footer.tsx");
+    expect(home).toContain("mergeHomepageContent(counters.homepage)");
+    expect(home).toContain("content.sectionOrder.map");
+    expect(navigation).toContain("mergeNavigationContent(settings.navigation)");
+    expect(navigation).toContain("navigation.items.filter");
+    expect(footer).toContain("mergeNavigationContent(settings.navigation)");
+    expect(footer).toContain("navigation.footerDescription");
+  });
+
   it("shows the assistant a proactive notice only when a published priority exists", () => {
     const advisor = readProjectFile("client/src/components/SadaqahAdvisor.tsx");
     expect(advisor).toContain("activePriorities.length > 0");

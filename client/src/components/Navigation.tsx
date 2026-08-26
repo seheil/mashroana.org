@@ -1,22 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Menu, X } from "lucide-react";
+import { subscribeToSettings } from "@/lib/firestore-ops";
+import { mergeNavigationContent } from "@shared/content-studio-defaults";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [navigation, setNavigation] = useState(() => mergeNavigationContent());
 
-  const navItems = [
-    { label: "الرئيسية", href: "/" },
-    { label: "عن المؤسسة", href: "/about" },
-    { label: "المشاريع", href: "/projects" },
-    { label: "إنجازاتنا", href: "/achievements" },
-    { label: "المكتبة", href: "/media" },
-    { label: "الشفافية", href: "/transparency" },
-    { label: "الشراكات", href: "/partnerships" },
-    { label: "تطوع", href: "/volunteer" },
-    { label: "تبرع", href: "/#donate" },
-    { label: "تواصل معنا", href: "/contact" },
-  ];
+  useEffect(() => subscribeToSettings((settings) => setNavigation(mergeNavigationContent(settings.navigation))), []);
+
+  const navItems = navigation.items.filter((item) => item.enabled);
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50" aria-label="التنقل الرئيسي">
@@ -26,7 +20,7 @@ export default function Navigation() {
           <Link href="/" className="flex items-center gap-2" aria-label="الانتقال إلى الصفحة الرئيسية">
             <div className="text-2xl font-bold text-green-600" aria-hidden="true">🌱</div>
             <span className="hidden md:inline text-lg font-bold text-gray-800">
-              مؤسسة مشروعنا
+              {navigation.brandShortName}
             </span>
           </Link>
 
@@ -49,7 +43,7 @@ export default function Navigation() {
               href="/#donate"
               className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition-colors"
             >
-              تبرع الآن
+              {navigation.donateLabel}
             </a>
             <Link
               href="/admin"
@@ -90,7 +84,7 @@ export default function Navigation() {
               className="block mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-center"
               onClick={() => setIsOpen(false)}
             >
-              تبرع الآن
+              {navigation.donateLabel}
             </a>
           </div>
         )}

@@ -39,6 +39,7 @@ import {
 } from "@/lib/firestore-ops";
 import { uploadMediaFile } from "@/lib/media-upload";
 import DonationPriorityManager from "@/components/DonationPriorityManager";
+import ContentStudioManager from "@/components/ContentStudioManager";
 import {
   FirestoreProject,
   FirestoreAchievement,
@@ -653,6 +654,7 @@ export default function AdminDashboard() {
           {[
             { id: "dashboard", label: "📊 لوحة التحكم" },
             { id: "content", label: "✍️ المحتوى المؤسسي" },
+            { id: "studio", label: "🎛️ الواجهة والأقسام" },
             { id: "projects", label: "📋 المشاريع" },
             { id: "achievements", label: "🏆 الإنجازات" },
             { id: "media", label: "🖼️ مكتبة الوسائط" },
@@ -705,7 +707,7 @@ export default function AdminDashboard() {
                   <label className="block text-gray-700 font-semibold mb-2">{item.label}</label>
                   <input
                     type="number"
-                    value={counters[item.key as keyof FirestoreSettings] || 0}
+                  value={counters[item.key as keyof Pick<FirestoreSettings, "orphans" | "students" | "patients" | "families">] || 0}
                     onChange={(e) =>
                       setCounters({
                         ...counters,
@@ -816,6 +818,27 @@ export default function AdminDashboard() {
             </div>
             <Button onClick={handleSaveCounters} disabled={saving} className="mt-6 w-full bg-emerald-700 text-white hover:bg-emerald-800">{saving ? "جاري حفظ المحتوى..." : "حفظ المحتوى المؤسسي"}</Button>
           </div>
+        )}
+
+        {activeTab === "studio" && (
+          <ContentStudioManager
+            settings={counters}
+            saving={saving}
+            onSave={async (updates) => {
+              try {
+                setSaving(true);
+                await updateSettings(updates);
+                setCounters((current) => ({ ...current, ...updates }));
+                setMessage("✅ تم حفظ إعدادات الواجهة والتنقل.");
+              } catch (error) {
+                console.error("Content studio save error:", error);
+                setMessage("❌ تعذر حفظ إعدادات الواجهة. راجعي قواعد Firebase ثم حاولي مرة أخرى.");
+                throw error;
+              } finally {
+                setSaving(false);
+              }
+            }}
+          />
         )}
 
         {/* PROJECTS TAB */}
