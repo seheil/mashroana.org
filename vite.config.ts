@@ -167,6 +167,18 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/firebase/") || id.includes("@firebase")) return "firebase-vendor";
+          if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("/wouter/")) return "react-vendor";
+          if (id.includes("/lucide-react/") || id.includes("/@radix-ui/") || id.includes("/framer-motion/")) return "ui-vendor";
+          if (id.includes("/@trpc/") || id.includes("/zod/") || id.includes("/superjson/")) return "data-vendor";
+          return "vendor";
+        },
+      },
+    },
   },
   server: {
     host: true,

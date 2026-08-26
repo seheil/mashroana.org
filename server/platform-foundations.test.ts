@@ -183,4 +183,13 @@ describe("grant-ready platform foundations", () => {
     expect(donationModal).not.toContain("سيتم تأكيد تبرعك فوراً");
     expect(donationModal).toContain('aria-live="polite"');
   });
+
+  it("splits major production dependencies into cacheable chunks", () => {
+    const viteConfig = readProjectFile("vite.config.ts");
+    expect(viteConfig).toContain("manualChunks");
+    expect(viteConfig).toContain("firebase-vendor");
+    expect(viteConfig).toContain("react-vendor");
+    expect(viteConfig).toContain("ui-vendor");
+    expect(viteConfig).toContain("data-vendor");
+  });
 });
