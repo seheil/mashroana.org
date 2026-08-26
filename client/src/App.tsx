@@ -22,6 +22,8 @@ const MediaLibrary = lazy(() => import("./pages/MediaLibrary"));
 const Transparency = lazy(() => import("./pages/Transparency"));
 const Partnerships = lazy(() => import("./pages/Partnerships"));
 const Volunteer = lazy(() => import("./pages/Volunteer"));
+const ImpactMethodology = lazy(() => import("./pages/ImpactMethodology"));
+const InternationalBrief = lazy(() => import("./pages/InternationalBrief"));
 
 function Router() {
   return (
@@ -45,6 +47,8 @@ function Router() {
             <Route path={"/achievements"} component={Achievements} />
             <Route path={"/media"} component={MediaLibrary} />
             <Route path={"/transparency"} component={Transparency} />
+            <Route path={"/impact-methodology"} component={ImpactMethodology} />
+            <Route path={"/international-brief"} component={InternationalBrief} />
             <Route path={"/partnerships"} component={Partnerships} />
             <Route path={"/volunteer"} component={Volunteer} />
             <Route path={"/admin-login"} component={AdminLogin} />

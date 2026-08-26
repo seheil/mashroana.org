@@ -99,4 +99,36 @@ describe("grant-ready platform foundations", () => {
     expect(volunteerPage).toContain("سياسة التعامل مع طلبات التطوع");
     expect(volunteerPage).toContain("القبول أو الاعتذار");
   });
+
+  it("publishes a transparent impact-methodology route without inventing impact numbers", () => {
+    const appSource = readProjectFile("client/src/App.tsx");
+    const methodology = readProjectFile("client/src/pages/ImpactMethodology.tsx");
+    const transparency = readProjectFile("client/src/pages/Transparency.tsx");
+    expect(appSource).toContain('<Route path={"/impact-methodology"} component={ImpactMethodology} />');
+    expect(methodology).toContain("لا رقم بلا سياق");
+    expect(methodology).toContain("لا أثر بلا مصدر");
+    expect(methodology).toContain("قيد التوثيق");
+    expect(methodology).toContain("لا تُنشر بيانات تعريفية");
+    expect(transparency).toContain('href="/impact-methodology"');
+  });
+
+  it("provides an honest English-facing partner brief without presenting it as legal verification", () => {
+    const appSource = readProjectFile("client/src/App.tsx");
+    const brief = readProjectFile("client/src/pages/InternationalBrief.tsx");
+    const partnerships = readProjectFile("client/src/pages/Partnerships.tsx");
+    expect(appSource).toContain('<Route path={"/international-brief"} component={InternationalBrief} />');
+    expect(brief).toContain("This brief is not a funding proposal, financial report, or legal verification document.");
+    expect(brief).toContain("Public contact point");
+    expect(partnerships).toContain("Open English partner brief");
+  });
+
+  it("aligns the public privacy notice with the website’s actual forms and unconfirmed donation flow", () => {
+    const privacy = readProjectFile("client/src/pages/Privacy.tsx");
+    expect(privacy).toContain("لا يعالج هذا الموقع بطاقات دفع أو مبالغ تبرع");
+    expect(privacy).toContain("لا توجد حالياً نشرة بريدية أو CRM");
+    expect(privacy).toContain("عند طلب شراكة");
+    expect(privacy).toContain("عند طلب تطوع");
+    expect(privacy).toContain("Firestore");
+    expect(privacy).not.toContain("advanced protection systems");
+  });
 });
