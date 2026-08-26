@@ -100,24 +100,27 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 hover:bg-blue-700 w-10 h-10 rounded-full flex items-center justify-center"
+                aria-label="صفحة المؤسسة على فيسبوك"
               >
-                f
+                <span aria-hidden="true">f</span>
               </a>
               <a
                 href={foundationData.contact.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 w-10 h-10 rounded-full flex items-center justify-center"
+                aria-label="التواصل مع المؤسسة عبر واتساب"
               >
-                W
+                <span aria-hidden="true">W</span>
               </a>
               <a
                 href={foundationData.contact.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-500 hover:bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center"
+                aria-label="قناة المؤسسة على تيليجرام"
               >
-                T
+                <span aria-hidden="true">T</span>
               </a>
             </div>
           </div>

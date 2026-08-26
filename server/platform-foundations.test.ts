@@ -268,4 +268,13 @@ describe("grant-ready platform foundations", () => {
     expect(app).toContain('"/accessibility"');
     expect(footer).toContain("بيان الإتاحة");
   });
+
+  it("gives icon-only official contact actions clear accessible names", () => {
+    const floating = readProjectFile("client/src/components/FloatingButtons.tsx");
+    const footer = readProjectFile("client/src/components/Footer.tsx");
+    expect(floating).toContain("تواصل مع المؤسسة عبر واتساب");
+    expect(floating).toContain("فتح قناة التبرع الرسمية عبر إنستاباي");
+    expect(footer).toContain("صفحة المؤسسة على فيسبوك");
+    expect(footer).toContain("قناة المؤسسة على تيليجرام");
+  });
 });
