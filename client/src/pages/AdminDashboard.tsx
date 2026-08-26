@@ -15,6 +15,10 @@ import {
   subscribeToSettings,
   getAllContactMessages,
   subscribeToContactMessages,
+  subscribeToPartnerInquiries,
+  subscribeToVolunteerApplications,
+  updatePartnerInquiryStatus,
+  updateVolunteerApplicationStatus,
   addAchievement,
   updateAchievement,
   deleteAchievement,
@@ -38,6 +42,8 @@ import {
   FirestoreProject,
   FirestoreAchievement,
   FirestoreSettings,
+  FirestorePartnerInquiry,
+  FirestoreVolunteerApplication,
   FirestoreMediaItem,
   FirestoreTask,
   FirestoreDocument,
@@ -74,6 +80,9 @@ export default function AdminDashboard() {
   // Messages state
   const [messages, setMessages] = useState<any[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [partnerInquiries, setPartnerInquiries] = useState<FirestorePartnerInquiry[]>([]);
+  const [volunteerApplications, setVolunteerApplications] = useState<FirestoreVolunteerApplication[]>([]);
+  const [loadingInquiries, setLoadingInquiries] = useState(false);
 
   // Projects state
   const [projects, setProjects] = useState<FirestoreProject[]>([]);
@@ -173,6 +182,22 @@ export default function AdminDashboard() {
         setLoadingMessages(false);
       });
 
+      setLoadingInquiries(true);
+      const unsubscribePartnerInquiries = subscribeToPartnerInquiries(
+        (items) => {
+          setPartnerInquiries(items);
+          setLoadingInquiries(false);
+        },
+        () => {
+          setLoadingInquiries(false);
+          setMessage("❌ تعذر تحميل طلبات الشراكة.");
+        }
+      );
+      const unsubscribeVolunteerApplications = subscribeToVolunteerApplications(
+        (items) => setVolunteerApplications(items),
+        () => setMessage("❌ تعذر تحميل طلبات التطوع.")
+      );
+
       // Subscribe to projects
       setLoadingProjects(true);
       const unsubscribeProjects = subscribeToProjects((proj) => {
@@ -226,6 +251,8 @@ export default function AdminDashboard() {
       return () => {
         unsubscribeSettings();
         unsubscribeMessages();
+        unsubscribePartnerInquiries();
+        unsubscribeVolunteerApplications();
         unsubscribeProjects();
         unsubscribeAchievements();
         unsubscribeMedia();
@@ -571,6 +598,24 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUpdateInquiryStatus = async (
+    kind: "partner" | "volunteer",
+    id: string,
+    status: NonNullable<FirestorePartnerInquiry["status"]>
+  ) => {
+    try {
+      if (kind === "partner") {
+        await updatePartnerInquiryStatus(id, status);
+      } else {
+        await updateVolunteerApplicationStatus(id, status);
+      }
+      setMessage("✅ تم تحديث حالة الطلب.");
+    } catch (error) {
+      console.error("Inquiry status update error:", error);
+      setMessage("❌ تعذر تحديث حالة الطلب.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -613,6 +658,7 @@ export default function AdminDashboard() {
             { id: "tasks", label: "✓ المهام" },
             { id: "documents", label: "📄 الوثائق" },
             { id: "messages", label: "💬 الرسائل" },
+            { id: "inquiries", label: "🤝 الشراكات والتطوع" },
             { id: "knowledge", label: "🧠 قاعدة المعرفة" },
           ].map((tab) => (
             <button
@@ -1276,6 +1322,28 @@ export default function AdminDashboard() {
                     <p className="text-gray-700 bg-gray-50 p-3 rounded">{msg.message}</p>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PARTNERSHIP AND VOLUNTEER INQUIRIES TAB */}
+        {activeTab === "inquiries" && (
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-900">طلبات الشراكة والتطوع</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-600">هذه البيانات خاصة بالفريق. لا تظهر لزوار الموقع، وتُدار وفق قواعد Firebase بعد تطبيقها واختبارها. لطلبات التطوع: ابدئي بالمراجعة، ثم تواصلي فقط عند الملاءمة، ولا تؤكدي أي نشاط ميداني قبل إيضاح الدور والمشرف وقواعد حماية المستفيدين.</p>
+            </div>
+            {loadingInquiries ? <div className="rounded-xl bg-white py-10 text-center text-slate-500">جاري تحميل الطلبات...</div> : (
+              <div className="grid gap-6 xl:grid-cols-2">
+                <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
+                  <h3 className="text-xl font-black text-slate-900">طلبات الشراكة ({partnerInquiries.length})</h3>
+                  {partnerInquiries.length === 0 ? <p className="mt-5 text-slate-500">لا توجد طلبات شراكة بعد.</p> : <div className="mt-5 space-y-4">{partnerInquiries.map((item) => <article key={item.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start justify-between gap-3"><div><h4 className="font-bold text-slate-900">{item.organizationName}</h4><p className="mt-1 text-sm text-slate-600">{item.contactName} · {item.email}</p></div><select value={item.status || "new"} onChange={(event) => item.id && handleUpdateInquiryStatus("partner", item.id, event.target.value as NonNullable<FirestorePartnerInquiry["status"]>)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"><option value="new">جديد</option><option value="in_review">قيد المراجعة</option><option value="contacted">تم التواصل</option><option value="closed">مغلق</option></select></div><p className="mt-3 text-sm text-slate-700">{item.sector} · {item.cooperationType}</p>{item.programInterest && <p className="mt-2 text-sm text-slate-600">مجال الاهتمام: {item.programInterest}</p>}{item.timeline && <p className="mt-1 text-sm text-slate-600">الإطار الزمني: {item.timeline}</p>}{item.notes && <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-700">{item.notes}</p>}</article>)}</div>}
+                </section>
+                <section className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm">
+                  <h3 className="text-xl font-black text-slate-900">طلبات التطوع ({volunteerApplications.length})</h3>
+                  {volunteerApplications.length === 0 ? <p className="mt-5 text-slate-500">لا توجد طلبات تطوع بعد.</p> : <div className="mt-5 space-y-4">{volunteerApplications.map((item) => <article key={item.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start justify-between gap-3"><div><h4 className="font-bold text-slate-900">{item.name}</h4><p className="mt-1 text-sm text-slate-600">{item.email}</p></div><select value={item.status || "new"} onChange={(event) => item.id && handleUpdateInquiryStatus("volunteer", item.id, event.target.value as NonNullable<FirestoreVolunteerApplication["status"]>)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"><option value="new">جديد</option><option value="in_review">قيد المراجعة</option><option value="contacted">تم التواصل</option><option value="closed">مغلق</option></select></div><p className="mt-3 text-sm text-slate-700">{item.areaOfInterest} · {item.availability}</p>{item.skills && <p className="mt-2 text-sm text-slate-600">المهارات: {item.skills}</p>}{item.message && <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-700">{item.message}</p>}</article>)}</div>}
+                </section>
               </div>
             )}
           </div>

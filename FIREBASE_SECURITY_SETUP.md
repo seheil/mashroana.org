@@ -63,6 +63,23 @@ service cloud.firestore {
       ]);
       allow read, update, delete: if admin();
     }
+
+    match /partnerInquiries/{inquiryId} {
+      allow create: if request.resource.data.keys().hasOnly([
+        'organizationName', 'sector', 'contactName', 'email', 'phone',
+        'cooperationType', 'programInterest', 'estimatedValue', 'timeline',
+        'notes', 'consent', 'status', 'timestamp'
+      ]) && request.resource.data.consent == true;
+      allow read, update, delete: if admin();
+    }
+
+    match /volunteerApplications/{applicationId} {
+      allow create: if request.resource.data.keys().hasOnly([
+        'name', 'email', 'phone', 'availability', 'areaOfInterest',
+        'skills', 'message', 'consent', 'status', 'timestamp'
+      ]) && request.resource.data.consent == true;
+      allow read, update, delete: if admin();
+    }
   }
 }
 ```
@@ -75,7 +92,7 @@ service cloud.firestore {
 
 ## 4. اختبري القواعد قبل الإطلاق
 
-بعد نشر القواعد، سجلي الدخول بأحد حسابات الإدارة واختبري إضافة مشروع، ومادة إعلامية مسودة، ووثيقة منشورة. ثم افتحي الموقع في نافذة خاصة أو متصفح غير مسجل الدخول للتأكد من أن المحتوى المنشور فقط هو الظاهر، ومن عدم القدرة على فتح `/admin` أو قراءة الرسائل.
+بعد نشر القواعد، سجلي الدخول بأحد حسابات الإدارة واختبري إضافة مشروع، ومادة إعلامية مسودة، ووثيقة منشورة. ثم أرسلي طلب شراكة وطلب تطوع تجريبيين من نافذة خاصة للتأكد من حفظهما وإتاحتهما للمسؤول فقط. افتحي الموقع في نافذة خاصة أو متصفح غير مسجل الدخول للتأكد من أن المحتوى المنشور فقط هو الظاهر، ومن عدم القدرة على فتح `/admin` أو قراءة الرسائل أو الطلبات.
 
 ## مراجع
 

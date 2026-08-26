@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin-login
+Disallow: /admin-dashboard
+Disallow: /admin-panel
+
+Sitemap: https://mashroana.org/sitemap.xml

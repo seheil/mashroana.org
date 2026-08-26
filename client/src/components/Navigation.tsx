@@ -13,24 +13,25 @@ export default function Navigation() {
     { label: "المكتبة", href: "/media" },
     { label: "الشفافية", href: "/transparency" },
     { label: "الشراكات", href: "/partnerships" },
+    { label: "تطوع", href: "/volunteer" },
     { label: "تبرع", href: "/#donate" },
     { label: "تواصل معنا", href: "/contact" },
   ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white shadow-md sticky top-0 z-50" aria-label="التنقل الرئيسي">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold text-green-600">🌱</div>
+          <Link href="/" className="flex items-center gap-2" aria-label="الانتقال إلى الصفحة الرئيسية">
+            <div className="text-2xl font-bold text-green-600" aria-hidden="true">🌱</div>
             <span className="hidden md:inline text-lg font-bold text-gray-800">
               مؤسسة مشروعنا
             </span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex gap-8">
+          <div className="hidden md:flex gap-8" aria-label="روابط الموقع">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -62,14 +63,18 @@ export default function Navigation() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-gray-700"
+            type="button"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            aria-label={isOpen ? "إغلاق قائمة التنقل" : "فتح قائمة التنقل"}
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-200">
+          <div id="mobile-navigation" className="md:hidden pb-4 border-t border-gray-200" aria-label="روابط التنقل على الهاتف">
             {navItems.map((item) => (
               <Link
                 key={item.href}

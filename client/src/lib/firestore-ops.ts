@@ -21,6 +21,8 @@ import {
   FirestoreAchievement,
   FirestoreSettings,
   FirestoreContactMessage,
+  FirestorePartnerInquiry,
+  FirestoreVolunteerApplication,
   FirestoreMediaItem,
   FirestoreTask,
   FirestoreDocument,
@@ -309,6 +311,80 @@ export async function deleteContactMessage(id: string) {
     console.error("Error deleting contact message:", error);
     throw error;
   }
+}
+
+// ============================================================================
+// PARTNERSHIP AND VOLUNTEER INQUIRIES
+// ============================================================================
+
+export async function addPartnerInquiry(
+  inquiry: Omit<FirestorePartnerInquiry, "id" | "timestamp" | "status">
+) {
+  try {
+    const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.PARTNER_INQUIRIES), {
+      ...inquiry,
+      status: "new",
+      timestamp: serverTimestamp(),
+    });
+    return { id: docRef.id, ...inquiry, status: "new" as const };
+  } catch (error) {
+    console.error("Error adding partner inquiry:", error);
+    throw error;
+  }
+}
+
+export async function addVolunteerApplication(
+  application: Omit<FirestoreVolunteerApplication, "id" | "timestamp" | "status">
+) {
+  try {
+    const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.VOLUNTEER_APPLICATIONS), {
+      ...application,
+      status: "new",
+      timestamp: serverTimestamp(),
+    });
+    return { id: docRef.id, ...application, status: "new" as const };
+  } catch (error) {
+    console.error("Error adding volunteer application:", error);
+    throw error;
+  }
+}
+
+export function subscribeToPartnerInquiries(
+  callback: (inquiries: FirestorePartnerInquiry[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.PARTNER_INQUIRIES),
+    (snapshot) => callback(snapshot.docs.map((inquiryDoc) => ({ id: inquiryDoc.id, ...inquiryDoc.data() } as FirestorePartnerInquiry))),
+    (error) => onError?.(error)
+  );
+}
+
+export function subscribeToVolunteerApplications(
+  callback: (applications: FirestoreVolunteerApplication[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    collection(db, FIRESTORE_COLLECTIONS.VOLUNTEER_APPLICATIONS),
+    (snapshot) => callback(snapshot.docs.map((applicationDoc) => ({ id: applicationDoc.id, ...applicationDoc.data() } as FirestoreVolunteerApplication))),
+    (error) => onError?.(error)
+  );
+}
+
+export async function updatePartnerInquiryStatus(
+  id: string,
+  status: FirestorePartnerInquiry["status"]
+) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.PARTNER_INQUIRIES, id), { status });
+  return { id, status };
+}
+
+export async function updateVolunteerApplicationStatus(
+  id: string,
+  status: FirestoreVolunteerApplication["status"]
+) {
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.VOLUNTEER_APPLICATIONS, id), { status });
+  return { id, status };
 }
 
 // ============================================================================

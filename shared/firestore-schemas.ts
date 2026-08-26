@@ -64,6 +64,39 @@ export interface FirestoreContactMessage {
   read?: boolean;
 }
 
+export type InquiryStatus = "new" | "in_review" | "contacted" | "closed";
+
+export interface FirestorePartnerInquiry {
+  id?: string;
+  organizationName: string;
+  sector: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  cooperationType: string;
+  programInterest?: string;
+  estimatedValue?: string;
+  timeline?: string;
+  notes?: string;
+  consent: boolean;
+  status?: InquiryStatus;
+  timestamp?: number;
+}
+
+export interface FirestoreVolunteerApplication {
+  id?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  availability: string;
+  areaOfInterest: string;
+  skills?: string;
+  message?: string;
+  consent: boolean;
+  status?: InquiryStatus;
+  timestamp?: number;
+}
+
 export type MediaKind = "image" | "video";
 export type PublishStatus = "draft" | "published" | "archived";
 
@@ -122,6 +155,8 @@ export const FIRESTORE_COLLECTIONS = {
   ACHIEVEMENTS: "achievements",
   SETTINGS: "settings",
   CONTACT_MESSAGES: "contactMessages",
+  PARTNER_INQUIRIES: "partnerInquiries",
+  VOLUNTEER_APPLICATIONS: "volunteerApplications",
   MEDIA: "media",
   TASKS: "tasks",
   DOCUMENTS: "documents",
