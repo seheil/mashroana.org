@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { subscribeToMediaItems } from "@/lib/firestore-ops";
 import type { FirestoreMediaItem } from "@shared/firestore-schemas";
@@ -9,6 +9,14 @@ export default function MediaLibrary() {
   const [error, setError] = useState("");
   const [category, setCategory] = useState("all");
   const [activeItem, setActiveItem] = useState<FirestoreMediaItem | null>(null);
+  const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const closeActiveItem = useCallback(() => {
+    setActiveItem(null);
+    window.setTimeout(() => activeTriggerRef.current?.focus(), 0);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = subscribeToMediaItems(
@@ -30,6 +38,34 @@ export default function MediaLibrary() {
   );
   const visibleItems = category === "all" ? items : items.filter((item) => item.category === category);
 
+  useEffect(() => {
+    if (!activeItem) return;
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeActiveItem();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), [tabindex]:not([tabindex='-1']), video[controls]"));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [activeItem, closeActiveItem]);
+
   return (
     <div className="min-h-screen bg-[#f8faf7] text-slate-900">
       <section className="relative overflow-hidden bg-[#123c2c] px-4 py-20 text-white">
@@ -41,6 +77,7 @@ export default function MediaLibrary() {
           <p className="mt-6 max-w-2xl text-lg leading-8 text-emerald-50/90">
             صور وفيديوهات موثقة من برامج المؤسسة، تُعرض مع وصف وسياق يحترم خصوصية المستفيدين وحقوق النشر.
           </p>
+          <Link href="/media-kit" className="mt-6 inline-block rounded-xl border border-white/40 px-4 py-2.5 font-bold text-white hover:bg-white/10">الحزمة الإعلامية وسياسة الاستخدام</Link>
         </div>
       </section>
 
@@ -70,7 +107,7 @@ export default function MediaLibrary() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visibleItems.map((item) => (
               <article key={item.id} className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-lg">
-                <button type="button" onClick={() => setActiveItem(item)} className="block w-full text-right" aria-label={`فتح ${item.title}`}>
+                <button type="button" onClick={(event) => { activeTriggerRef.current = event.currentTarget; setActiveItem(item); }} className="block w-full text-right" aria-label={`فتح ${item.title}`}>
                   <div className="aspect-[4/3] overflow-hidden bg-slate-100">
                     {item.kind === "video" ? <video src={item.mediaUrl} className="h-full w-full object-cover" muted preload="metadata" /> : <img src={item.mediaUrl} alt={item.altText} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}
                   </div>
@@ -93,7 +130,7 @@ export default function MediaLibrary() {
         </div>
       </section>
 
-      {activeItem && <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 p-4" onClick={() => setActiveItem(null)}><div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white" onClick={(event) => event.stopPropagation()}><div className="bg-slate-950">{activeItem.kind === "video" ? <video src={activeItem.mediaUrl} controls className="max-h-[65vh] w-full" /> : <img src={activeItem.mediaUrl} alt={activeItem.altText} className="max-h-[65vh] w-full object-contain" />}</div><div className="p-6"><div className="flex items-start justify-between gap-5"><div><p className="text-sm font-bold text-emerald-700">{activeItem.category}</p><h2 className="mt-1 text-2xl font-black">{activeItem.title}</h2></div><button type="button" onClick={() => setActiveItem(null)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold">إغلاق</button></div><p className="mt-4 leading-8 text-slate-700">{activeItem.description}</p>{(activeItem.location || activeItem.capturedAt) && <p className="mt-4 text-sm text-slate-500">{activeItem.location ? `الموقع: ${activeItem.location}` : ""}{activeItem.location && activeItem.capturedAt ? " · " : ""}{activeItem.capturedAt ? `التاريخ: ${activeItem.capturedAt}` : ""}</p>}<p className="mt-3 text-xs leading-5 text-slate-500">حقوق النشر: {activeItem.rightsNote}</p></div></div></div>}
+      {activeItem && <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeActiveItem(); }}><div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="media-dialog-title" aria-describedby="media-dialog-description" className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white"><div className="bg-slate-950">{activeItem.kind === "video" ? <video src={activeItem.mediaUrl} controls className="max-h-[65vh] w-full" /> : <img src={activeItem.mediaUrl} alt={activeItem.altText} className="max-h-[65vh] w-full object-contain" />}</div><div className="p-6"><div className="flex items-start justify-between gap-5"><div><p className="text-sm font-bold text-emerald-700">{activeItem.category}</p><h2 id="media-dialog-title" className="mt-1 text-2xl font-black">{activeItem.title}</h2></div><button ref={closeButtonRef} type="button" onClick={closeActiveItem} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold" aria-label="إغلاق عرض الوسائط">إغلاق</button></div><p id="media-dialog-description" className="mt-4 leading-8 text-slate-700">{activeItem.description}</p>{(activeItem.location || activeItem.capturedAt) && <p className="mt-4 text-sm text-slate-500">{activeItem.location ? `الموقع: ${activeItem.location}` : ""}{activeItem.location && activeItem.capturedAt ? " · " : ""}{activeItem.capturedAt ? `التاريخ: ${activeItem.capturedAt}` : ""}</p>}<p className="mt-3 text-xs leading-5 text-slate-500">حقوق النشر: {activeItem.rightsNote}</p></div></div></div>}
     </div>
   );
 }

@@ -131,4 +131,35 @@ describe("grant-ready platform foundations", () => {
     expect(privacy).toContain("Firestore");
     expect(privacy).not.toContain("advanced protection systems");
   });
+
+  it("provides a media-kit route with an approval-based identity and media-use policy", () => {
+    const appSource = readProjectFile("client/src/App.tsx");
+    const mediaKit = readProjectFile("client/src/pages/MediaKit.tsx");
+    const library = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    expect(appSource).toContain('<Route path={"/media-kit"} component={MediaKit} />');
+    expect(mediaKit).toContain("بموافقة مسبقة");
+    expect(mediaKit).toContain("استخدام غير مسموح دون موافقة");
+    expect(mediaKit).toContain("لا تعرض الصفحة حالياً شعاراً أو ملفات تنزيل");
+    expect(library).toContain('href="/media-kit"');
+  });
+
+  it("makes the media-library detail dialog keyboard accessible", () => {
+    const library = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    expect(library).toContain('role="dialog"');
+    expect(library).toContain('aria-modal="true"');
+    expect(library).toContain('event.key === "Escape"');
+    expect(library).toContain("activeTriggerRef.current?.focus()");
+    expect(library).toContain("closeButtonRef.current?.focus()");
+  });
+
+  it("provides an Arabic partner brief with clear collaboration boundaries", () => {
+    const appSource = readProjectFile("client/src/App.tsx");
+    const partnerBrief = readProjectFile("client/src/pages/PartnerBriefArabic.tsx");
+    const partnerships = readProjectFile("client/src/pages/Partnerships.tsx");
+    expect(appSource).toContain('<Route path={"/partner-brief"} component={PartnerBriefArabic} />');
+    expect(partnerBrief).toContain("لا تمثل عرض تمويل نهائياً");
+    expect(partnerBrief).toContain("العناية الواجبة");
+    expect(partnerBrief).toContain("ما لا يفترضه هذا الموجز");
+    expect(partnerships).toContain("عرض الموجز العربي");
+  });
 });
