@@ -192,4 +192,40 @@ describe("grant-ready platform foundations", () => {
     expect(viteConfig).toContain("ui-vendor");
     expect(viteConfig).toContain("data-vendor");
   });
+
+  it("honours the user preference to reduce motion across public screens", () => {
+    const styles = readProjectFile("client/src/index.css");
+    expect(styles).toContain("prefers-reduced-motion: reduce");
+    expect(styles).toContain("animation-duration: 0.01ms !important");
+    expect(styles).toContain("scroll-behavior: auto");
+  });
+
+  it("uses route-specific public metadata while preventing search indexing of administration routes", () => {
+    const app = readProjectFile("client/src/App.tsx");
+    expect(app).toContain("routeMetadata");
+    expect(app).toContain("International Partner Brief");
+    expect(app).toContain("noindex, nofollow");
+    expect(app).toContain("/admin-dashboard");
+    expect(app).toContain('rel = "canonical"');
+  });
+
+  it("keeps partnership and volunteer forms accessible during submission and recoverable after an error", () => {
+    const forms = readProjectFile("client/src/components/InterestForms.tsx");
+    expect(forms).toContain('aria-busy={status === "sending"}');
+    expect(forms).toContain('aria-disabled={status === "sending"}');
+    expect(forms).toContain("const updateConsent");
+    expect(forms).toContain('setStatus("idle")');
+  });
+
+  it("offers a safe retry path when public Firestore data cannot be loaded", () => {
+    const projects = readProjectFile("client/src/pages/Projects.tsx");
+    const media = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    const transparency = readProjectFile("client/src/pages/Transparency.tsx");
+    expect(projects).toContain("loadAttempt");
+    expect(media).toContain("loadAttempt");
+    expect(transparency).toContain("retryLoad");
+    expect(projects).toContain("إعادة المحاولة");
+    expect(media).toContain("إعادة المحاولة");
+    expect(transparency).toContain("إعادة المحاولة");
+  });
 });

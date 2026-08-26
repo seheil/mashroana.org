@@ -8,6 +8,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -44,7 +45,7 @@ export default function Projects() {
       setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
       setLoading(false);
     }
-  }, []);
+  }, [loadAttempt]);
 
   if (loading) {
     return (
@@ -68,8 +69,9 @@ export default function Projects() {
         </div>
 
         {error && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded mb-8" role="status">
-            {error}
+          <div className="mb-8 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900" role="status">
+            <p>{error}</p>
+            <button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mt-3 rounded-lg border border-amber-400 px-3 py-2 text-sm font-bold hover:bg-amber-100">إعادة المحاولة</button>
           </div>
         )}
 

@@ -1,8 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { lazy, Suspense } from "react";
-import { Route, Switch } from "wouter";
+import { lazy, Suspense, useEffect } from "react";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -27,9 +27,55 @@ const InternationalBrief = lazy(() => import("./pages/InternationalBrief"));
 const MediaKit = lazy(() => import("./pages/MediaKit"));
 const PartnerBriefArabic = lazy(() => import("./pages/PartnerBriefArabic"));
 
+const routeMetadata: Record<string, { title: string; description: string; noindex?: boolean }> = {
+  "/": { title: "مؤسسة مشروعنا إلى الجنة للأعمال الخيرية", description: "منصة مؤسسة مشروعنا إلى الجنة للأعمال الخيرية للتعريف بالبرامج والشراكات وقنوات التبرع الرسمية." },
+  "/about": { title: "عن المؤسسة | مؤسسة مشروعنا إلى الجنة", description: "تعرف على رسالة المؤسسة ومجالات عملها ونهجها في خدمة المجتمع." },
+  "/projects": { title: "المشاريع والبرامج | مؤسسة مشروعنا إلى الجنة", description: "اطلع على البرامج التي تعتمد المؤسسة نشرها ومتابعة تطورها." },
+  "/achievements": { title: "إنجازاتنا | مؤسسة مشروعنا إلى الجنة", description: "تعرف على الإنجازات المنشورة من المؤسسة في إطار معلومات قابلة للمراجعة." },
+  "/media": { title: "مكتبة الأثر المرئي | مؤسسة مشروعنا إلى الجنة", description: "صور وفيديوهات منشورة من أعمال المؤسسة مع احترام الحقوق وخصوصية المستفيدين." },
+  "/gallery": { title: "مكتبة الأثر المرئي | مؤسسة مشروعنا إلى الجنة", description: "صور وفيديوهات منشورة من أعمال المؤسسة مع احترام الحقوق وخصوصية المستفيدين." },
+  "/media-kit": { title: "الحزمة الإعلامية | مؤسسة مشروعنا إلى الجنة", description: "إطار استخدام الاسم والهوية والمواد الإعلامية المعتمدة للمؤسسة." },
+  "/transparency": { title: "الشفافية والحوكمة | مؤسسة مشروعنا إلى الجنة", description: "مركز الوثائق والسياسات ومعلومات الحوكمة التي تعتمد المؤسسة مشاركتها." },
+  "/impact-methodology": { title: "منهجية قياس الأثر | مؤسسة مشروعنا إلى الجنة", description: "منهجية المؤسسة لنشر بيانات الأثر بسياق ومصدر وفترة تحقق." },
+  "/partnerships": { title: "الشراكات والمنح | مؤسسة مشروعنا إلى الجنة", description: "ابدأ حوار شراكة منظم مع المؤسسة حول البرامج والاحتياجات ومعلومات العناية الواجبة." },
+  "/partner-brief": { title: "موجز الشراكة | مؤسسة مشروعنا إلى الجنة", description: "موجز عربي يوضح نطاق التعاون وخطوات التقييم والعناية الواجبة." },
+  "/international-brief": { title: "International Partner Brief | Mashroana Foundation", description: "An English introduction to collaboration, due diligence and responsible partnership with Mashroana Foundation." },
+  "/volunteer": { title: "التطوع | مؤسسة مشروعنا إلى الجنة", description: "سجل اهتمامك بالتطوع وفق سياسة فرز وتواصل واضحة من المؤسسة." },
+  "/contact": { title: "تواصل معنا | مؤسسة مشروعنا إلى الجنة", description: "تواصل مع مؤسسة مشروعنا إلى الجنة عبر القنوات الرسمية أو نموذج الرسائل." },
+  "/privacy": { title: "سياسة الخصوصية | مؤسسة مشروعنا إلى الجنة", description: "تعرف على طريقة تعامل الموقع مع بيانات نماذج التواصل والشراكة والتطوع." },
+  "/admin-login": { title: "دخول الإدارة", description: "بوابة دخول الإدارة.", noindex: true },
+  "/admin-dashboard": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
+  "/admin": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
+  "/admin-panel": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
+};
+
+function RouteMetadata() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    const metadata = routeMetadata[location] ?? { title: "الصفحة غير موجودة | مؤسسة مشروعنا إلى الجنة", description: "الصفحة المطلوبة غير متاحة.", noindex: true };
+    document.title = metadata.title;
+
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]') ?? document.head.appendChild(document.createElement("meta"));
+    description.name = "description";
+    description.content = metadata.description;
+
+    const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]') ?? document.head.appendChild(document.createElement("meta"));
+    robots.name = "robots";
+    robots.content = metadata.noindex ? "noindex, nofollow" : "index, follow";
+
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]') ?? document.head.appendChild(document.createElement("link"));
+    canonical.rel = "canonical";
+    canonical.href = `${window.location.origin}${location === "/" ? "/" : location}`;
+  }, [location]);
+
+  return null;
+}
+
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
+      <RouteMetadata />
       <a
         href="#main-content"
         className="sr-only fixed right-4 top-4 z-[100] rounded-lg bg-emerald-800 px-4 py-3 font-bold text-white shadow-lg focus:not-sr-only focus:outline-none focus:ring-4 focus:ring-amber-300"
@@ -37,7 +83,7 @@ function Router() {
         تجاوز إلى المحتوى الرئيسي
       </a>
       <Navigation />
-      <main id="main-content" tabIndex={-1} className="flex-grow focus:outline-none">
+      <main id="main-content" tabIndex={-1} className="flex-grow focus:outline-none" aria-label="المحتوى الرئيسي">
         <Suspense fallback={<div className="px-4 py-20 text-center text-slate-600" role="status">جاري تحميل الصفحة...</div>}>
           <Switch>
             <Route path={"/"} component={Home} />

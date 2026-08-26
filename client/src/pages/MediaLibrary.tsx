@@ -7,6 +7,7 @@ export default function MediaLibrary() {
   const [items, setItems] = useState<FirestoreMediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [category, setCategory] = useState("all");
   const [activeItem, setActiveItem] = useState<FirestoreMediaItem | null>(null);
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -43,7 +44,7 @@ export default function MediaLibrary() {
       window.clearTimeout(timeoutId);
       unsubscribe();
     };
-  }, []);
+  }, [loadAttempt]);
 
   const categories = useMemo(
     () => ["all", ...Array.from(new Set(items.map((item) => item.category).filter(Boolean)))],
@@ -109,7 +110,7 @@ export default function MediaLibrary() {
         </div>
 
         {loading && <div className="rounded-2xl bg-white py-16 text-center text-slate-500 shadow-sm">جاري تحميل مكتبة الأثر...</div>}
-        {!loading && error && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-amber-900" role="status">{error}</div>}
+        {!loading && error && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-amber-900" role="status"><p>{error}</p><button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mt-4 rounded-xl border border-amber-400 px-4 py-2 font-bold hover:bg-amber-100">إعادة المحاولة</button></div>}
         {!loading && !error && visibleItems.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
             <h2 className="text-xl font-bold">ستتوفر مواد موثقة قريباً</h2>
