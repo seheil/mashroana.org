@@ -26,6 +26,7 @@ const ImpactMethodology = lazy(() => import("./pages/ImpactMethodology"));
 const InternationalBrief = lazy(() => import("./pages/InternationalBrief"));
 const MediaKit = lazy(() => import("./pages/MediaKit"));
 const PartnerBriefArabic = lazy(() => import("./pages/PartnerBriefArabic"));
+const Accessibility = lazy(() => import("./pages/Accessibility"));
 
 const routeMetadata: Record<string, { title: string; description: string; noindex?: boolean }> = {
   "/": { title: "مؤسسة مشروعنا إلى الجنة للأعمال الخيرية", description: "منصة مؤسسة مشروعنا إلى الجنة للأعمال الخيرية للتعريف بالبرامج والشراكات وقنوات التبرع الرسمية." },
@@ -43,6 +44,7 @@ const routeMetadata: Record<string, { title: string; description: string; noinde
   "/volunteer": { title: "التطوع | مؤسسة مشروعنا إلى الجنة", description: "سجل اهتمامك بالتطوع وفق سياسة فرز وتواصل واضحة من المؤسسة." },
   "/contact": { title: "تواصل معنا | مؤسسة مشروعنا إلى الجنة", description: "تواصل مع مؤسسة مشروعنا إلى الجنة عبر القنوات الرسمية أو نموذج الرسائل." },
   "/privacy": { title: "سياسة الخصوصية | مؤسسة مشروعنا إلى الجنة", description: "تعرف على طريقة تعامل الموقع مع بيانات نماذج التواصل والشراكة والتطوع." },
+  "/accessibility": { title: "بيان الإتاحة الرقمية | مؤسسة مشروعنا إلى الجنة", description: "تعرف على ممارسات الإتاحة الحالية وطرق طلب المساعدة البديلة من المؤسسة." },
   "/admin-login": { title: "دخول الإدارة", description: "بوابة دخول الإدارة.", noindex: true },
   "/admin-dashboard": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
   "/admin": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
@@ -110,6 +112,7 @@ function Router() {
             <Route path={"/about"} component={About} />
             <Route path={"/contact"} component={Contact} />
             <Route path={"/privacy"} component={Privacy} />
+            <Route path={"/accessibility"} component={Accessibility} />
             <Route path={"/gallery"} component={MediaLibrary} />
             <Route path={"/projects"} component={Projects} />
             <Route path={"/achievements"} component={Achievements} />

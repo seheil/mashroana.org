@@ -54,6 +54,11 @@ export default function Footer() {
                   سياسة الخصوصية
                 </Link>
               </li>
+              <li>
+                <Link href="/accessibility" className="text-gray-400 hover:text-white">
+                  بيان الإتاحة
+                </Link>
+              </li>
             </ul>
           </div>
 

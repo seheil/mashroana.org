@@ -258,4 +258,14 @@ describe("grant-ready platform foundations", () => {
     expect(notFound).toContain("المشاريع والبرامج");
     expect(notFound).toContain("تواصل معنا");
   });
+
+  it("publishes an honest Arabic accessibility statement and makes it discoverable", () => {
+    const accessibility = readProjectFile("client/src/pages/Accessibility.tsx");
+    const app = readProjectFile("client/src/App.tsx");
+    const footer = readProjectFile("client/src/components/Footer.tsx");
+    expect(accessibility).toContain("بيان الإتاحة الرقمية");
+    expect(accessibility).toContain("لا ندّعي توافقاً قانونياً أو تقنياً");
+    expect(app).toContain('"/accessibility"');
+    expect(footer).toContain("بيان الإتاحة");
+  });
 });
