@@ -293,6 +293,7 @@ describe("grant-ready platform foundations", () => {
     const home = readProjectFile("client/src/pages/Home.tsx");
     expect(advisor).toContain("parseArabicDonationAmount");
     expect(advisor).toContain("status === \"published\"");
+    expect(advisor).toContain("subscribeToPublishedDonationPriorities");
     expect(advisor).toContain("اقترح تقسيم 1000 جنيه");
     expect(notice).toContain("لا تُعرض أي حالة عند عدم وجود أولوية موثقة");
     expect(home).toContain("DonationPriorityNotice");

@@ -8,7 +8,7 @@ import {
   FAQ_ITEMS,
   DONATION_ADVISOR_EXPERTISE,
 } from "@shared/foundation-knowledge";
-import { subscribeToDonationPriorities } from "@/lib/firestore-ops";
+import { subscribeToPublishedDonationPriorities } from "@/lib/firestore-ops";
 import type { FirestoreDonationPriority } from "@shared/firestore-schemas";
 import { getDonationRecommendation, parseArabicDonationAmount } from "@shared/donation-priority-engine";
 
@@ -64,7 +64,7 @@ export function SadaqahAdvisor() {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => subscribeToDonationPriorities(setPriorities, () => setPriorities([])), []);
+  useEffect(() => subscribeToPublishedDonationPriorities(setPriorities, () => setPriorities([])), []);
 
   const activePriorities = priorities.filter((priority) => priority.status === "published" && (!priority.endsAt || new Date(`${priority.endsAt}T23:59:59`).getTime() >= Date.now()));
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, CalendarDays, HeartHandshake } from "lucide-react";
 import { Link } from "wouter";
-import { subscribeToDonationPriorities } from "@/lib/firestore-ops";
+import { subscribeToPublishedDonationPriorities } from "@/lib/firestore-ops";
 import type { FirestoreDonationPriority } from "@shared/firestore-schemas";
 
 function priorityTimestamp(value: unknown) {
@@ -18,7 +18,7 @@ export default function DonationPriorityNotice() {
   const [priorities, setPriorities] = useState<FirestoreDonationPriority[]>([]);
 
   useEffect(() => {
-    const unsubscribe = subscribeToDonationPriorities((items) => setPriorities(items.filter(isActive).slice(0, 3)));
+    const unsubscribe = subscribeToPublishedDonationPriorities((items) => setPriorities(items.filter(isActive).slice(0, 3)));
     return unsubscribe;
   }, []);
 

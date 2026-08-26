@@ -8,6 +8,7 @@ const firestore = vi.hoisted(() => ({
   doc: vi.fn((database: unknown, name: string, id: string) => ({ database, name, id })),
   getDocs: vi.fn(),
   query: vi.fn((value: unknown) => value),
+  where: vi.fn((field: string, operator: string, value: unknown) => ({ field, operator, value })),
   onSnapshot: vi.fn(),
   serverTimestamp: vi.fn(() => "SERVER_TIMESTAMP"),
   Timestamp: class Timestamp {},
@@ -33,6 +34,7 @@ import {
   updateDonationPriority,
   deleteDonationPriority,
   subscribeToDonationPriorities,
+  subscribeToPublishedDonationPriorities,
 } from "../client/src/lib/firestore-ops";
 
 describe("عمليات Firestore الإدارية", () => {
@@ -192,5 +194,16 @@ describe("عمليات Firestore الإدارية", () => {
     expect(callback).toHaveBeenCalledWith([expect.objectContaining({ id: "priority-1", status: "published" })]);
     expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: "permission-denied" }));
     expect(result).toBe(unsubscribe);
+  });
+
+  it("يطلب الموقع العام الأولويات المنشورة فقط ولا يستعلم عن المسودات", () => {
+    const unsubscribe = vi.fn();
+    firestore.onSnapshot.mockImplementation((_reference: unknown, onNext: Function) => {
+      onNext({ docs: [] });
+      return unsubscribe;
+    });
+    subscribeToPublishedDonationPriorities(vi.fn());
+    expect(firestore.where).toHaveBeenCalledWith("status", "==", "published");
+    expect(firestore.onSnapshot).toHaveBeenCalled();
   });
 });

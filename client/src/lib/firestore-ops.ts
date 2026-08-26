@@ -11,6 +11,7 @@ import {
   doc,
   getDocs,
   query,
+  where,
   onSnapshot,
   serverTimestamp,
   Timestamp,
@@ -557,6 +558,22 @@ export function subscribeToDonationPriorities(
 ) {
   return onSnapshot(
     collection(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES),
+    (snapshot) => {
+      const priorities = snapshot.docs
+        .map((priorityDoc) => ({ id: priorityDoc.id, ...priorityDoc.data() } as FirestoreDonationPriority))
+        .sort((first, second) => priorityTime(second.updatedAt || second.createdAt) - priorityTime(first.updatedAt || first.createdAt));
+      callback(priorities);
+    },
+    (error) => onError?.(error)
+  );
+}
+
+export function subscribeToPublishedDonationPriorities(
+  callback: (priorities: FirestoreDonationPriority[]) => void,
+  onError?: (error: Error) => void
+) {
+  return onSnapshot(
+    query(collection(db, FIRESTORE_COLLECTIONS.DONATION_PRIORITIES), where("status", "==", "published")),
     (snapshot) => {
       const priorities = snapshot.docs
         .map((priorityDoc) => ({ id: priorityDoc.id, ...priorityDoc.data() } as FirestoreDonationPriority))
