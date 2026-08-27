@@ -47,6 +47,15 @@ describe("أسس موقع المؤسسة الثابت", () => {
     expect(vercel).toContain('"buildCommand": "pnpm install --frozen-lockfile && pnpm build"');
     expect(vercel).toContain('"handle": "filesystem"');
     expect(vercel).toContain('"dest": "/index.html"');
+    expect(vercel).toContain('"dest": "/api/sitemap"');
+  });
+
+  it("يولد خريطة موقع من نطاق النشر الفعلي بدلاً من تثبيت نطاق قديم", () => {
+    const sitemap = readProjectFile("api/sitemap.ts");
+    const robots = readProjectFile("client/public/robots.txt");
+    expect(sitemap).toContain("x-forwarded-host");
+    expect(sitemap).toContain("/partnerships");
+    expect(robots).toContain("Sitemap: /sitemap.xml");
   });
 
   it("يرسل نماذج التواصل والشراكة والتطوع إلى واتساب فقط", () => {

@@ -4,5 +4,6 @@ Disallow: /admin
 Disallow: /admin-login
 Disallow: /admin-dashboard
 Disallow: /admin-panel
+Disallow: /cms/
 
-Sitemap: https://mashroana.org/sitemap.xml
+Sitemap: /sitemap.xml
