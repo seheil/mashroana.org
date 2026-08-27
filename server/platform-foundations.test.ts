@@ -32,9 +32,9 @@ describe("أسس موقع المؤسسة الثابت", () => {
     const app = readProjectFile("client/src/App.tsx");
     const hub = readProjectFile("client/src/pages/GitHubAdminHub.tsx");
     expect(app).toContain("GitHubAdminHub");
-    expect(hub).toContain("/admin/");
-    expect(existsSync(resolve(process.cwd(), "client/public/admin/config.yml"))).toBe(true);
-    const cms = readProjectFile("client/public/admin/config.yml");
+    expect(hub).toContain("/cms/");
+    expect(existsSync(resolve(process.cwd(), "client/public/cms/config.yml"))).toBe(true);
+    const cms = readProjectFile("client/public/cms/config.yml");
     expect(cms).toContain("name: github");
     expect(cms).toContain("name: homepage");
     expect(cms).toContain("name: navigation");
@@ -45,7 +45,8 @@ describe("أسس موقع المؤسسة الثابت", () => {
     const vercel = readProjectFile("vercel.json");
     expect(vercel).toContain('"framework": "vite"');
     expect(vercel).toContain('"buildCommand": "pnpm install --frozen-lockfile && pnpm build"');
-    expect(vercel).toContain('"destination": "/index.html"');
+    expect(vercel).toContain('"handle": "filesystem"');
+    expect(vercel).toContain('"dest": "/index.html"');
   });
 
   it("يرسل نماذج التواصل والشراكة والتطوع إلى واتساب فقط", () => {
