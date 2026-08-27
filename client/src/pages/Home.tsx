@@ -2,33 +2,17 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import DonationPriorityNotice from "@/components/DonationPriorityNotice";
-import { subscribeToProjects, subscribeToSettings } from "@/lib/firestore-ops";
+import { ProgramIcon } from "@/components/ProgramIcon";
 import { foundationData } from "@/../../shared/foundation-data";
+import { staticSiteContent } from "@/content/static-content";
 import { mergeHomepageContent } from "@shared/content-studio-defaults";
 import type { FirestoreProject, FirestoreSettings, HomepageSectionId } from "@shared/firestore-schemas";
 
 const initialCounters: FirestoreSettings = { orphans: 0, students: 0, patients: 0, families: 0 };
 
 export default function Home() {
-  const [projects, setProjects] = useState<FirestoreProject[]>([]);
-  const [counters, setCounters] = useState<FirestoreSettings>(initialCounters);
-  const [loadingProjects, setLoadingProjects] = useState(true);
-  const [projectsError, setProjectsError] = useState("");
-
-  useEffect(() => {
-    const unsubscribeProjects = subscribeToProjects((items) => {
-      setProjects(items);
-      setLoadingProjects(false);
-    }, () => {
-      setProjectsError("تعذر تحميل البرامج الآن. يمكنك زيارة صفحة التواصل أو المحاولة لاحقاً.");
-      setLoadingProjects(false);
-    });
-    const unsubscribeSettings = subscribeToSettings(setCounters, () => setCounters(initialCounters));
-    return () => {
-      unsubscribeProjects();
-      unsubscribeSettings();
-    };
-  }, []);
+  const projects: FirestoreProject[] = staticSiteContent.projects;
+  const counters: FirestoreSettings = { ...initialCounters, ...staticSiteContent.settings };
 
   const content = useMemo(() => mergeHomepageContent(counters.homepage), [counters.homepage]);
   const impactCards = [
@@ -55,7 +39,7 @@ export default function Home() {
     programs: content.programs.enabled ? (
       <section key="programs" className="mx-auto max-w-6xl px-4 py-20">
         <div className="flex flex-col gap-5 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between"><div><p className="text-sm font-bold tracking-[0.14em] text-emerald-700">{content.programs.eyebrow}</p><h2 className="mt-2 text-3xl font-black md:text-4xl">{content.programs.title}</h2><p className="mt-3 max-w-2xl leading-7 text-slate-600">{content.programs.description}</p></div><Link href="/projects" className="w-fit rounded-xl border border-emerald-700 px-5 py-3 font-bold text-emerald-800 hover:bg-emerald-50">{content.programs.ctaLabel}</Link></div>
-        {loadingProjects ? <div className="py-14 text-center text-slate-500">جاري تحميل البرامج...</div> : projectsError ? <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center leading-7 text-amber-950">{projectsError}</div> : projects.length === 0 ? <div className="py-14 text-center text-slate-500">ستظهر البرامج المعتمدة هنا فور إضافتها من لوحة الإدارة.</div> : <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{projects.slice(0, 6).map((project) => <article key={project.id} className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl">{project.icon || "✦"}</div><h3 className="mt-5 text-xl font-black">{project.name}</h3><p className="mt-3 min-h-14 leading-7 text-slate-600">{project.description}</p><a href="#donate" className="mt-5 inline-flex font-bold text-emerald-800 hover:underline">دعم هذا المجال ←</a></article>)}</div>}
+        {projects.length === 0 ? <div className="py-14 text-center text-slate-500">ستظهر البرامج المعتمدة هنا بعد إضافتها إلى ملف المحتوى في GitHub.</div> : <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{projects.slice(0, 6).map((project) => <article key={project.id} className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800"><ProgramIcon id={project.id} /></div><h3 className="mt-5 text-xl font-black">{project.name}</h3><p className="mt-3 min-h-14 leading-7 text-slate-600">{project.description}</p><a href="#donate" className="mt-5 inline-flex font-bold text-emerald-800 hover:underline">دعم هذا المجال ←</a></article>)}</div>}
       </section>
     ) : null,
     partnerships: content.partnerships.enabled ? (
@@ -65,7 +49,7 @@ export default function Home() {
       <section key="media" className="bg-[#eef5ee] px-4 py-20"><div className="mx-auto max-w-6xl"><p className="text-sm font-bold tracking-[0.14em] text-emerald-700">{content.media.eyebrow}</p><h2 className="mt-3 max-w-3xl text-3xl font-black">{content.media.title}</h2><p className="mt-4 max-w-3xl leading-8 text-slate-600">{content.media.description}</p><Link href="/media" className="mt-6 inline-block font-bold text-emerald-800 hover:underline">{content.media.ctaLabel}</Link></div></section>
     ) : null,
     donate: content.donate.enabled ? (
-      <section key="donate" id="donate" className="scroll-mt-20 bg-white px-4 py-20"><div className="mx-auto max-w-6xl"><div className="max-w-3xl"><p className="text-sm font-bold tracking-[0.14em] text-emerald-700">{content.donate.eyebrow}</p><h2 className="mt-2 text-3xl font-black md:text-4xl">{content.donate.title}</h2><p className="mt-3 leading-7 text-slate-600">{content.donate.description}</p></div><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4"><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">حساب بنك مصر</p><p className="mt-3 break-all rounded-lg bg-slate-50 p-3 font-mono text-sm">{foundationData.payment.bankMisr.accountNumber}</p><Button onClick={() => navigator.clipboard.writeText(foundationData.payment.bankMisr.accountNumber)} className="mt-4 w-full bg-[#123c2c] text-white hover:bg-[#0a2b1e]">نسخ الرقم</Button></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">InstaPay</p><p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">تحويل فوري عبر الرابط الرسمي للمؤسسة.</p><a href={foundationData.payment.instapay.link} target="_blank" rel="noreferrer" className="mt-4 block rounded-lg bg-[#1976d2] px-4 py-2.5 text-center font-bold text-white">فتح InstaPay</a></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">Vodafone Cash</p><p className="mt-3 rounded-lg bg-slate-50 p-3 font-mono text-sm">{foundationData.payment.vodafoneCash.number}</p><Button onClick={() => navigator.clipboard.writeText(foundationData.payment.vodafoneCash.number)} className="mt-4 w-full bg-red-600 text-white hover:bg-red-700">نسخ الرقم</Button></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">تواصل قبل التبرع</p><p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">اطلب توجيهاً إلى البرنامج أو استفسر عن وسيلة التحويل.</p><a href={foundationData.contact.whatsapp} target="_blank" rel="noreferrer" className="mt-4 block rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-bold text-white">WhatsApp</a></article></div><p className="mt-7 rounded-xl bg-amber-50 p-4 text-center text-sm leading-7 text-amber-950">{foundationData.payment.trustMessage}</p></div></section>
+      <section key="donate" id="donate" className="scroll-mt-20 bg-white px-4 py-20"><div className="mx-auto max-w-6xl"><div className="max-w-3xl"><p className="text-sm font-bold tracking-[0.14em] text-emerald-700">{content.donate.eyebrow}</p><h2 className="mt-2 text-3xl font-black md:text-4xl">{content.donate.title}</h2><p className="mt-3 leading-7 text-slate-600">{content.donate.description}</p></div><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4"><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">حساب بنك مصر</p><p className="mt-3 break-all rounded-lg bg-slate-50 p-3 font-mono text-sm">{foundationData.payment.bankMisr.accountNumber}</p><Button onClick={() => navigator.clipboard.writeText(foundationData.payment.bankMisr.accountNumber)} className="mt-4 w-full bg-[#123c2c] text-white hover:bg-[#0a2b1e]">نسخ الرقم</Button></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">InstaPay</p><p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">تحويل فوري عبر الرابط الرسمي للمؤسسة.</p><a href={foundationData.payment.instapay.link} target="_blank" rel="noreferrer" className="mt-4 block rounded-lg bg-[#1976d2] px-4 py-2.5 text-center font-bold text-white">فتح InstaPay</a></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">Vodafone Cash</p><p className="mt-3 rounded-lg bg-slate-50 p-3 font-mono text-sm">{foundationData.payment.vodafoneCash.number}</p><Button onClick={() => navigator.clipboard.writeText(foundationData.payment.vodafoneCash.number)} className="mt-4 w-full bg-red-600 text-white hover:bg-red-700">نسخ الرقم</Button></article><article className="rounded-2xl border border-slate-200 p-5"><p className="font-black">تواصل قبل التبرع</p><p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">اطلب توجيهاً إلى البرنامج أو استفسر عن وسيلة التحويل.</p><a href={foundationData.contact.whatsapp} target="_blank" rel="noreferrer" className="mt-4 block rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-bold text-white">WhatsApp</a></article></div><p className="mt-7 rounded-xl bg-amber-50 p-4 text-center text-sm leading-7 text-amber-950">{foundationData.payment.trustMessage}</p><section className="mt-8 rounded-3xl border border-emerald-100 bg-[#f4f8f3] p-6" aria-labelledby="responsible-support-title"><div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="text-sm font-bold tracking-[0.14em] text-emerald-700">دعم مسؤول وواضح</p><h3 id="responsible-support-title" className="mt-2 text-2xl font-black text-[#123c2c]">كيف تحوّل نيتك إلى دعم منظم؟</h3></div><Link href="/transparency" className="w-fit font-bold text-emerald-800 hover:underline">راجع نهج الشفافية ←</Link></div><ol className="mt-6 grid gap-3 md:grid-cols-4">{["اختر البرنامج أو اطلب توجيهاً من المؤسسة.", "استخدم إحدى القنوات الرسمية الظاهرة أعلاه.", "احتفظ بإيصال التحويل للمتابعة عند الحاجة.", "تواصل مع المؤسسة لأي سؤال أو توثيق لاحق."].map((step, index) => <li key={step} className="rounded-2xl bg-white p-4 text-sm leading-6 text-slate-700 shadow-sm"><span className="mb-3 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-black text-white">{index + 1}</span>{step}</li>)}</ol></section></div></section>
     ) : null,
   };
 

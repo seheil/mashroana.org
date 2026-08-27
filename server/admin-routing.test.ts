@@ -12,16 +12,16 @@ const contactSource = readFileSync(
 );
 
 describe("المسارات الإدارية ومصدر الرسائل", () => {
-  it("يوحد جميع مسارات الإدارة على لوحة Firestore الرسمية", () => {
-    expect(appSource).toContain('<Route path={"/admin"} component={AdminDashboard} />');
-    expect(appSource).toContain('<Route path={"/admin-panel"} component={AdminDashboard} />');
-    expect(appSource).not.toContain('component={AdminPanel}');
-    expect(appSource).not.toContain('component={Admin}');
+  it("يوحد مسارات الإدارة على بوابة محتوى GitHub دون Firebase", () => {
+    expect(appSource).toContain('<Route path={"/admin"} component={GitHubAdminHub} />');
+    expect(appSource).toContain('<Route path={"/admin-panel"} component={GitHubAdminHub} />');
+    expect(appSource).not.toContain('AdminDashboard');
+    expect(appSource).not.toContain('AdminLogin');
   });
 
-  it("يرسل نموذج التواصل إلى عملية Firestore الموحدة", () => {
-    expect(contactSource).toContain('import { addContactMessage } from "@/lib/firestore-ops"');
-    expect(contactSource).toContain('await addContactMessage(formData)');
-    expect(contactSource).not.toContain('collection(db, "messages")');
+  it("يفتح نموذج التواصل رسالة واتساب صريحة ولا يخزن البيانات في الموقع", () => {
+    expect(contactSource).toContain('foundationData.contact.whatsapp');
+    expect(contactSource).toContain('لا تُحفظ هذه البيانات في الموقع');
+    expect(contactSource).not.toContain('addContactMessage');
   });
 });

@@ -1,48 +1,8 @@
-import { useState, useEffect } from "react";
-import { subscribeToAchievements } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import { FirestoreAchievement } from "@shared/firestore-schemas";
 
 export default function Achievements() {
-  const [achievements, setAchievements] = useState<FirestoreAchievement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const unsubscribe = subscribeToAchievements((achievementsList) => {
-        setAchievements(achievementsList);
-        setLoading(false);
-        setError(null);
-      }, () => {
-        setError("حدث خطأ في تحميل الإنجازات. يرجى المحاولة لاحقاً.");
-        setLoading(false);
-      });
-
-      return () => {
-        if (unsubscribe) unsubscribe();
-      };
-    } catch (err) {
-      console.error("Error loading achievements:", err);
-      setError("حدث خطأ في تحميل الإنجازات. يرجى المحاولة لاحقاً.");
-      setLoading(false);
-    }
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">جاري تحميل الإنجازات...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const achievements: FirestoreAchievement[] = staticSiteContent.achievements;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-16">
@@ -52,15 +12,9 @@ export default function Achievements() {
           <p className="text-xl text-gray-600">تعرف على ما حققناه من إنجازات على مدار السنوات</p>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-8">
-            {error}
-          </div>
-        )}
-
         {achievements.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">لا توجد إنجازات متاحة حالياً</p>
+            <p className="text-gray-500 text-lg">ستظهر الإنجازات المعتمدة هنا بعد إضافتها إلى ملف المحتوى في GitHub.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

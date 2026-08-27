@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { foundationData } from "@/../../shared/foundation-data";
-import { subscribeToSettings } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import { mergeAboutContent } from "@shared/content-studio-defaults";
-import type { FirestoreSettings } from "@shared/firestore-schemas";
 
 export default function About() {
-  const [settings, setSettings] = useState<FirestoreSettings>({ orphans: 0, students: 0, patients: 0, families: 0 });
-  useEffect(() => subscribeToSettings(setSettings), []);
+  const settings = staticSiteContent.settings;
   const about = mergeAboutContent(settings.about);
 
   return (

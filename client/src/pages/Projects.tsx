@@ -1,64 +1,12 @@
-import { useState, useEffect } from "react";
-import { subscribeToProjects } from "@/lib/firestore-ops";
+import { useState } from "react";
+import { staticSiteContent } from "@/content/static-content";
 import { FirestoreProject } from "@shared/firestore-schemas";
 import { Button } from "@/components/ui/button";
+import { ProgramIcon } from "@/components/ProgramIcon";
 
 export default function Projects() {
-  const [projects, setProjects] = useState<FirestoreProject[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const projects: FirestoreProject[] = staticSiteContent.projects;
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
-  const [loadAttempt, setLoadAttempt] = useState(0);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    let resolved = false;
-    const timeoutId = window.setTimeout(() => {
-      if (resolved) return;
-      setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
-      setLoading(false);
-    }, 6000);
-
-    try {
-      const unsubscribe = subscribeToProjects((projectsList) => {
-        resolved = true;
-        window.clearTimeout(timeoutId);
-        setProjects(projectsList);
-        setLoading(false);
-        setError(null);
-      }, () => {
-        resolved = true;
-        window.clearTimeout(timeoutId);
-        setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
-        setLoading(false);
-      });
-
-      return () => {
-        window.clearTimeout(timeoutId);
-        if (unsubscribe) unsubscribe();
-      };
-    } catch (err) {
-      console.error("Error loading projects:", err);
-      resolved = true;
-      window.clearTimeout(timeoutId);
-      setError("لم تتوفر بيانات المشاريع في الوقت الحالي. نعرض البرامج فور اعتمادها؛ ويمكنكم التواصل مع المؤسسة للاستفسار.");
-      setLoading(false);
-    }
-  }, [loadAttempt]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-            <p className="mt-4 text-gray-600">جاري تحميل المشاريع...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-16">
@@ -68,16 +16,9 @@ export default function Projects() {
           <p className="text-xl text-gray-600">تعرف على المجالات التي نعمل فيها لخدمة المجتمع</p>
         </div>
 
-        {error && (
-          <div className="mb-8 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900" role="status">
-            <p>{error}</p>
-            <button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mt-3 rounded-lg border border-amber-400 px-3 py-2 text-sm font-bold hover:bg-amber-100">إعادة المحاولة</button>
-          </div>
-        )}
-
         {projects.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">لا توجد مشاريع متاحة حالياً</p>
+            <p className="text-gray-500 text-lg">لا توجد مشاريع منشورة حالياً في ملف المحتوى.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -87,7 +28,7 @@ export default function Projects() {
                 className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 cursor-pointer"
                 onClick={() => setSelectedProgram(selectedProgram === project.id ? null : (project.id || null))}
               >
-                <div className="text-4xl mb-4">{project.icon}</div>
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800"><ProgramIcon id={project.id} className="h-7 w-7" /></div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{project.name}</h3>
                 <p className="text-gray-600 mb-4">{project.description}</p>
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white">

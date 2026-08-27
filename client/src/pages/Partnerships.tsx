@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { subscribeToSettings } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import { PartnerInquiryForm } from "@/components/InterestForms";
-import type { FirestoreSettings } from "@shared/firestore-schemas";
 
 export default function Partnerships() {
-  const [settings, setSettings] = useState<FirestoreSettings>({ orphans: 0, students: 0, patients: 0, families: 0 });
-  useEffect(() => subscribeToSettings(setSettings), []);
+  const settings = staticSiteContent.settings;
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <section className="bg-gradient-to-bl from-[#123c2c] via-[#18563d] to-emerald-700 px-4 py-20 text-white"><div className="mx-auto max-w-6xl"><p className="text-sm font-bold tracking-[0.16em] text-emerald-100">شراكات تصنع أثراً مسؤولاً</p><h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight md:text-6xl">{settings.partnershipsHeadline || "نتعاون لنحوّل الموارد إلى أثر يمكن تتبعه"}</h1><p className="mt-6 max-w-3xl whitespace-pre-line text-lg leading-8 text-emerald-50">{settings.partnershipsDescription || "ندعو الشركات والجهات المانحة والمؤسسات الشريكة إلى دعم برامج واضحة، بمؤشرات أثر ومحتوى موثق وقنوات تواصل مباشرة."}</p><div className="mt-9 flex flex-wrap gap-3"><a href="#partner-inquiry" className="rounded-xl bg-white px-5 py-3 font-bold text-[#123c2c]">ابدأوا طلب شراكة</a><Link href="/transparency" className="rounded-xl border border-white/40 px-5 py-3 font-bold text-white hover:bg-white/10">مركز الشفافية</Link></div></div></section>

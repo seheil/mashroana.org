@@ -1,7 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import { foundationData } from "@/../../shared/foundation-data";
 import { Button } from "@/components/ui/button";
-import { addContactMessage } from "@/lib/firestore-ops";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -11,33 +10,24 @@ export default function Contact() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionError, setSubmissionError] = useState("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData((previous) => ({ ...previous, [name]: value }));
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(false);
-    setSubmissionError("");
-    setIsSubmitting(true);
-
-    try {
-      await addContactMessage(formData);
-      setSubmitted(true);
-      window.setTimeout(() => {
-        setFormData({ name: "", email: "", phone: "", message: "" });
-        setSubmitted(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      setSubmissionError("تعذر إرسال الرسالة الآن. تحققي من الاتصال أو تواصلي معنا عبر WhatsApp.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    const message = [
+      "رسالة من موقع مؤسسة مشروعنا إلى الجنة",
+      `الاسم: ${formData.name}`,
+      `البريد: ${formData.email}`,
+      formData.phone ? `الهاتف: ${formData.phone}` : "",
+      `الرسالة: ${formData.message}`,
+    ].filter(Boolean).join("\n");
+    window.open(`${foundationData.contact.whatsapp}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    setSubmitted(true);
   };
 
   return (
@@ -83,16 +73,11 @@ export default function Contact() {
             <h2 className="mb-6 text-2xl font-bold text-gray-800">أرسل لنا رسالة</h2>
             {submitted && (
               <div className="mb-6 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700" role="status" aria-live="polite">
-                تم استلام رسالتك بنجاح! سنرد عليك قريباً.
-              </div>
-            )}
-            {submissionError && (
-              <div className="mb-6 rounded border border-red-300 bg-red-50 px-4 py-3 text-red-800" role="alert">
-                {submissionError}
+                فُتح WhatsApp لإرسال رسالتك مباشرة إلى المؤسسة. لا تُعد الرسالة مرسلة إلا بعد ضغط زر الإرسال داخل WhatsApp.
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4" aria-describedby="contact-form-help">
-              <p id="contact-form-help" className="text-sm leading-6 text-gray-600">الحقول المعلَّمة مطلوبة. نستخدم بياناتك للرد على رسالتك فقط.</p>
+              <p id="contact-form-help" className="text-sm leading-6 text-gray-600">الحقول المعلَّمة مطلوبة. عند الإرسال تُفتح رسالة واتساب للمؤسسة بالبيانات التي أدخلتها؛ لا تُحفظ هذه البيانات في الموقع.</p>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label htmlFor="contact-name" className="mb-2 block font-semibold text-gray-700">الاسم</label>
@@ -111,8 +96,8 @@ export default function Contact() {
                 <label htmlFor="contact-message" className="mb-2 block font-semibold text-gray-700">الرسالة</label>
                 <textarea id="contact-message" name="message" value={formData.message} onChange={handleChange} required rows={6} className="w-full rounded border border-gray-300 px-4 py-2 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-200" placeholder="اكتب رسالتك هنا..." />
               </div>
-              <Button type="submit" disabled={isSubmitting} className="w-full bg-green-600 py-3 font-bold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70">
-                {isSubmitting ? "جاري الإرسال..." : "إرسال الرسالة"}
+              <Button type="submit" className="w-full bg-green-600 py-3 font-bold text-white hover:bg-green-700">
+                فتح WhatsApp لإرسال الرسالة
               </Button>
             </form>
           </div>

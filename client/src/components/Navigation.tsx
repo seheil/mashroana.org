@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { Menu, X } from "lucide-react";
-import { subscribeToSettings } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import { mergeNavigationContent } from "@shared/content-studio-defaults";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const [navigation, setNavigation] = useState(() => mergeNavigationContent());
-
-  useEffect(() => subscribeToSettings((settings) => setNavigation(mergeNavigationContent(settings.navigation))), []);
+  const navigation = mergeNavigationContent(staticSiteContent.settings.navigation);
 
   const navItems = navigation.items.filter((item) => item.enabled);
 

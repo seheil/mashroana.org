@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
-import { subscribeToMediaItems, subscribeToSettings } from "@/lib/firestore-ops";
-import type { FirestoreMediaItem, FirestoreSettings } from "@shared/firestore-schemas";
+import { staticSiteContent } from "@/content/static-content";
+import type { FirestoreMediaItem } from "@shared/firestore-schemas";
 
 export default function MediaLibrary() {
-  const [items, setItems] = useState<FirestoreMediaItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [loadAttempt, setLoadAttempt] = useState(0);
+  const items = staticSiteContent.media.filter((item) => item.status === "published");
   const [category, setCategory] = useState("all");
   const [activeItem, setActiveItem] = useState<FirestoreMediaItem | null>(null);
-  const [settings, setSettings] = useState<FirestoreSettings>({ orphans: 0, students: 0, patients: 0, families: 0 });
+  const settings = staticSiteContent.settings;
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -19,35 +16,6 @@ export default function MediaLibrary() {
     setActiveItem(null);
     window.setTimeout(() => activeTriggerRef.current?.focus(), 0);
   }, []);
-
-  useEffect(() => {
-    let resolved = false;
-    const timeoutId = window.setTimeout(() => {
-      if (resolved) return;
-      setError("لم تتوفر مواد منشورة للعرض في الوقت الحالي. لا نعرض صوراً تجريبية؛ ويمكنكم التواصل مع المؤسسة لطلب معلومات معتمدة.");
-      setLoading(false);
-    }, 6000);
-    const unsubscribe = subscribeToMediaItems(
-      (nextItems) => {
-        resolved = true;
-        window.clearTimeout(timeoutId);
-        setItems(nextItems.filter((item) => item.status === "published"));
-        setLoading(false);
-      },
-      () => {
-        resolved = true;
-        window.clearTimeout(timeoutId);
-        setError("لم تتوفر مواد منشورة للعرض في الوقت الحالي. لا نعرض صوراً تجريبية؛ ويمكنكم التواصل مع المؤسسة لطلب معلومات معتمدة.");
-        setLoading(false);
-      }
-    );
-    return () => {
-      window.clearTimeout(timeoutId);
-      unsubscribe();
-    };
-  }, [loadAttempt]);
-
-  useEffect(() => subscribeToSettings(setSettings), []);
 
   const categories = useMemo(
     () => ["all", ...Array.from(new Set(items.map((item) => item.category).filter(Boolean)))],
@@ -112,15 +80,13 @@ export default function MediaLibrary() {
           ))}
         </div>
 
-        {loading && <div className="rounded-2xl bg-white py-16 text-center text-slate-500 shadow-sm">جاري تحميل مكتبة الأثر...</div>}
-        {!loading && error && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-amber-900" role="status"><p>{error}</p><button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mt-4 rounded-xl border border-amber-400 px-4 py-2 font-bold hover:bg-amber-100">إعادة المحاولة</button></div>}
-        {!loading && !error && visibleItems.length === 0 && (
+        {visibleItems.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
             <h2 className="text-xl font-bold">ستتوفر مواد موثقة قريباً</h2>
             <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-600">نحن لا نستخدم صوراً تجريبية في مكتبة الأثر. ستظهر هنا المواد التي تعتمد المؤسسة نشرها وتوثق سياقها.</p>
           </div>
         )}
-        {!loading && !error && visibleItems.length > 0 && (
+        {visibleItems.length > 0 && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visibleItems.map((item) => (
               <article key={item.id} className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-lg">

@@ -1,0 +1,70 @@
+backend:
+  name: github
+  repo: seheil/mashroana.org
+  branch: main
+  base_url: https://REPLACE_WITH_YOUR_VERCEL_DOMAIN.vercel.app
+  auth_endpoint: api/auth
+
+locale: ar
+media_folder: client/public/uploads
+public_folder: /uploads
+
+collections:
+  - name: site_content
+    label: محتوى الموقع
+    files:
+      - name: foundation_content
+        label: المحتوى العام والبرامج
+        file: client/src/content/site-content.json
+        fields:
+          - label: أرقام الأثر المعتمدة
+            name: settings
+            widget: object
+            fields:
+              - { label: أيتام، name: orphans, widget: number, value_type: int, required: false }
+              - { label: طلاب، name: students, widget: number, value_type: int, required: false }
+              - { label: حالات صحية، name: patients, widget: number, value_type: int, required: false }
+              - { label: أسر، name: families, widget: number, value_type: int, required: false }
+          - label: البرامج
+            name: projects
+            widget: list
+            fields:
+              - { label: المعرف، name: id, widget: string }
+              - { label: الاسم، name: name, widget: string }
+              - { label: الوصف، name: description, widget: text }
+              - { label: الرمز، name: icon, widget: string, required: false }
+          - label: الإنجازات
+            name: achievements
+            widget: list
+            fields:
+              - { label: العنوان، name: title, widget: string }
+              - { label: الوصف، name: description, widget: text }
+              - { label: السنة، name: year, widget: number, value_type: int }
+              - { label: الرمز، name: icon, widget: string }
+              - { label: رابط الصورة، name: imagePath, widget: string, required: false }
+          - label: وسائط منشورة
+            name: media
+            widget: list
+            fields:
+              - { label: العنوان، name: title, widget: string }
+              - { label: الوصف، name: description, widget: text }
+              - { label: النوع، name: kind, widget: select, options: [image, video] }
+              - { label: الرابط أو الملف، name: mediaUrl, widget: string }
+              - { label: الوصف البديل، name: altText, widget: string }
+              - { label: الفئة، name: category, widget: string }
+              - { label: حقوق الاستخدام، name: rightsNote, widget: text }
+              - { label: حالة النشر، name: status, widget: select, options: [draft, published, archived] }
+              - { label: موافقة النشر، name: consentConfirmed, widget: boolean, default: false }
+          - label: أولويات التبرع
+            name: donationPriorities
+            widget: list
+            fields:
+              - { label: العنوان، name: title, widget: string }
+              - { label: الوصف، name: description, widget: text }
+              - { label: معرف البرنامج، name: programId, widget: string }
+              - { label: اسم البرنامج، name: programName, widget: string }
+              - { label: النوع، name: kind, widget: select, options: [program, seasonal, urgent] }
+              - { label: الحالة، name: status, widget: select, options: [draft, published, closed] }
+              - { label: وزن التوصية، name: recommendationWeight, widget: number, value_type: int }
+              - { label: السبب، name: reason, widget: text }
+              - { label: مصدر التحقق، name: sourceNote, widget: text }

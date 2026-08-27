@@ -14,8 +14,7 @@ import { SadaqahAdvisor } from "./components/SadaqahAdvisor";
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const GitHubAdminHub = lazy(() => import("./pages/GitHubAdminHub"));
 const Projects = lazy(() => import("./pages/Projects"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 const MediaLibrary = lazy(() => import("./pages/MediaLibrary"));
@@ -45,10 +44,10 @@ const routeMetadata: Record<string, { title: string; description: string; noinde
   "/contact": { title: "تواصل معنا | مؤسسة مشروعنا إلى الجنة", description: "تواصل مع مؤسسة مشروعنا إلى الجنة عبر القنوات الرسمية أو نموذج الرسائل." },
   "/privacy": { title: "سياسة الخصوصية | مؤسسة مشروعنا إلى الجنة", description: "تعرف على طريقة تعامل الموقع مع بيانات نماذج التواصل والشراكة والتطوع." },
   "/accessibility": { title: "بيان الإتاحة الرقمية | مؤسسة مشروعنا إلى الجنة", description: "تعرف على ممارسات الإتاحة الحالية وطرق طلب المساعدة البديلة من المؤسسة." },
-  "/admin-login": { title: "دخول الإدارة", description: "بوابة دخول الإدارة.", noindex: true },
-  "/admin-dashboard": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
-  "/admin": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
-  "/admin-panel": { title: "لوحة الإدارة", description: "لوحة الإدارة.", noindex: true },
+  "/admin-login": { title: "دخول الإدارة", description: "بوابة إدارة المحتوى عبر GitHub.", noindex: true },
+  "/admin-dashboard": { title: "لوحة الإدارة", description: "بوابة إدارة المحتوى عبر GitHub.", noindex: true },
+  "/admin": { title: "لوحة الإدارة", description: "بوابة إدارة المحتوى عبر GitHub.", noindex: true },
+  "/admin-panel": { title: "لوحة الإدارة", description: "بوابة إدارة المحتوى عبر GitHub.", noindex: true },
 };
 
 function RouteMetadata() {
@@ -124,10 +123,10 @@ function Router() {
             <Route path={"/partnerships"} component={Partnerships} />
             <Route path={"/partner-brief"} component={PartnerBriefArabic} />
             <Route path={"/volunteer"} component={Volunteer} />
-            <Route path={"/admin-login"} component={AdminLogin} />
-            <Route path={"/admin-dashboard"} component={AdminDashboard} />
-            <Route path={"/admin"} component={AdminDashboard} />
-            <Route path={"/admin-panel"} component={AdminDashboard} />
+            <Route path={"/admin-login"} component={GitHubAdminHub} />
+            <Route path={"/admin-dashboard"} component={GitHubAdminHub} />
+            <Route path={"/admin"} component={GitHubAdminHub} />
+            <Route path={"/admin-panel"} component={GitHubAdminHub} />
             <Route path={"/404"} component={NotFound} />
             <Route component={NotFound} />
           </Switch>

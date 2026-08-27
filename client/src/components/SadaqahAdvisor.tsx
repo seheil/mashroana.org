@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FOUNDATION_INFO,
 } from "@shared/foundation-knowledge";
-import { subscribeToPublishedDonationPriorities } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import type { FirestoreDonationPriority } from "@shared/firestore-schemas";
 import { getDonationAdvisorResponse } from "@shared/donation-advisor-response";
 
@@ -49,7 +49,7 @@ export function SadaqahAdvisor() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [priorities, setPriorities] = useState<FirestoreDonationPriority[]>([]);
+  const priorities: FirestoreDonationPriority[] = staticSiteContent.donationPriorities;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -59,8 +59,6 @@ export function SadaqahAdvisor() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => subscribeToPublishedDonationPriorities(setPriorities, () => setPriorities([])), []);
 
   const activePriorities = priorities.filter((priority) => priority.status === "published" && (!priority.endsAt || new Date(`${priority.endsAt}T23:59:59`).getTime() >= Date.now()));
 

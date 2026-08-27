@@ -1,13 +1,10 @@
 import { Link } from "wouter";
-import { useEffect, useState } from "react";
 import { foundationData } from "@/../../shared/foundation-data";
-import { subscribeToSettings } from "@/lib/firestore-ops";
+import { staticSiteContent } from "@/content/static-content";
 import { mergeNavigationContent } from "@shared/content-studio-defaults";
 
 export default function Footer() {
-  const [navigation, setNavigation] = useState(() => mergeNavigationContent());
-
-  useEffect(() => subscribeToSettings((settings) => setNavigation(mergeNavigationContent(settings.navigation))), []);
+  const navigation = mergeNavigationContent(staticSiteContent.settings.navigation);
 
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">

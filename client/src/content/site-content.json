@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "orphans": 0,
+    "students": 0,
+    "patients": 0,
+    "families": 0,
+    "homepage": {}
+  },
+  "projects": [
+    { "id": "orphan-care", "name": "كفالة الأيتام", "description": "توفير الرعاية الشاملة للأيتام وتوفير احتياجاتهم الأساسية", "icon": "👶" },
+    { "id": "education", "name": "الدعم التعليمي", "description": "دعم الطلاب المحتاجين وتوفير المستلزمات الدراسية", "icon": "📚" },
+    { "id": "economic", "name": "التمكين الاقتصادي", "description": "مشاريع صغيرة لتمكين الأسر اقتصادياً", "icon": "💼" },
+    { "id": "tailoring", "name": "مشغل خياطة تحت التأسيس", "description": "مشغل خياطة لتدريب وتوظيف النساء", "icon": "🪡" },
+    { "id": "agriculture", "name": "زراعة النخيل والأشجار", "description": "مشروع غرس النخيل والأشجار المثمرة", "icon": "🌴" },
+    { "id": "sacrifice", "name": "صكوك الأضاحي", "description": "توفير الأضاحي للأسر المحتاجة في العيد", "icon": "🐑" },
+    { "id": "seasonal", "name": "المساعدات الموسمية", "description": "مساعدات موسمية خلال الأعياد والمناسبات", "icon": "🎁" },
+    { "id": "relief", "name": "الإغاثة الاجتماعية", "description": "إغاثة اجتماعية للأسر المتضررة", "icon": "🤝" },
+    { "id": "health", "name": "الصحة", "description": "عيادات طبية مجانية وتوفير الأدوية", "icon": "⚕️" },
+    { "id": "motherhood", "name": "الأمومة والطفولة", "description": "رعاية الأمهات والأطفال الصغار", "icon": "👪" },
+    { "id": "elderly", "name": "رعاية المسنين", "description": "رعاية اجتماعية وصحية للمسنين", "icon": "👴" },
+    { "id": "special-needs", "name": "ذوو الاحتياجات الخاصة", "description": "دعم وتأهيل ذوي الاحتياجات الخاصة", "icon": "♿" },
+    { "id": "institutional", "name": "التطوير المؤسسي", "description": "تطوير قدرات المؤسسة والعاملين بها", "icon": "🏢" }
+  ],
+  "achievements": [],
+  "media": [],
+  "documents": [],
+  "donationPriorities": []
+}

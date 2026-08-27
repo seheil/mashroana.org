@@ -2,7 +2,7 @@ import { foundationData } from "@/../../shared/foundation-data";
 
 export default function FloatingButtons() {
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-40">
+    <div className="fixed bottom-6 right-6 z-40 hidden flex-col gap-4 md:flex">
       {/* WhatsApp Button */}
       <a
         href={foundationData.contact.whatsapp}
