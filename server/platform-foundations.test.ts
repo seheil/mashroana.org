@@ -366,4 +366,14 @@ describe("grant-ready platform foundations", () => {
     expect(advisor).toContain("أولوية دعم منشورة الآن");
     expect(advisor).toContain("ما هي أولويات الدعم الحالية؟");
   });
+
+  it("uses validated Google Drive links for media rather than direct file uploads", () => {
+    const admin = readProjectFile("client/src/pages/AdminDashboard.tsx");
+    const media = readProjectFile("client/src/pages/MediaLibrary.tsx");
+    expect(admin).toContain("normaliseGoogleDriveMediaUrl");
+    expect(admin).toContain("رابط مشاركة الملف من Google Drive");
+    expect(admin).toContain("Anyone with the link");
+    expect(admin).not.toContain('type="file"');
+    expect(media).toContain("allow-presentation");
+  });
 });

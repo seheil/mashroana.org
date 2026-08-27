@@ -37,9 +37,9 @@ import {
   deleteDocument,
   subscribeToDocuments,
 } from "@/lib/firestore-ops";
-import { uploadMediaFile } from "@/lib/media-upload";
 import DonationPriorityManager from "@/components/DonationPriorityManager";
 import ContentStudioManager from "@/components/ContentStudioManager";
+import { normaliseGoogleDriveMediaUrl } from "@shared/google-drive-media";
 import {
   FirestoreProject,
   FirestoreAchievement,
@@ -119,7 +119,6 @@ export default function AdminDashboard() {
   const [loadingMedia, setLoadingMedia] = useState(false);
   const [savingMedia, setSavingMedia] = useState(false);
   const [editingMediaId, setEditingMediaId] = useState<string | null>(null);
-  const [selectedMediaFile, setSelectedMediaFile] = useState<File | null>(null);
   const [mediaDraft, setMediaDraft] = useState<Omit<FirestoreMediaItem, "id">>({
     title: "",
     description: "",
@@ -432,7 +431,6 @@ export default function AdminDashboard() {
 
   const resetMediaDraft = () => {
     setEditingMediaId(null);
-    setSelectedMediaFile(null);
     setMediaDraft({
       title: "",
       description: "",
@@ -462,19 +460,13 @@ export default function AdminDashboard() {
 
     try {
       setSavingMedia(true);
-      let mediaUrl = mediaDraft.mediaUrl.trim();
-      let kind = mediaDraft.kind;
-      if (selectedMediaFile) {
-        const uploaded = await uploadMediaFile(selectedMediaFile);
-        mediaUrl = uploaded.url;
-        kind = selectedMediaFile.type.startsWith("video/") ? "video" : "image";
-      }
+      const mediaUrl = normaliseGoogleDriveMediaUrl(mediaDraft.mediaUrl, mediaDraft.kind);
       if (!mediaUrl) {
-        setMessage("❌ اختاري ملفاً للرفع أو أضيفي رابط المادة.");
+        setMessage("❌ أضيفي رابط مشاركة صحيحاً من Google Drive. يجب ضبط الملف على «Anyone with the link» قبل الحفظ.");
         return;
       }
 
-      const payload = { ...mediaDraft, mediaUrl, kind };
+      const payload = { ...mediaDraft, mediaUrl };
       if (editingMediaId) {
         await updateMediaItem(editingMediaId, payload);
         setMessage("✅ تم تحديث المادة في المكتبة.");
@@ -1189,21 +1181,15 @@ export default function AdminDashboard() {
                   className="rounded-lg border border-slate-200 bg-white px-4 py-3 outline-none ring-emerald-500 transition focus:ring-2"
                 />
                 <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-                  onChange={(event) => setSelectedMediaFile(event.target.files?.[0] || null)}
-                  className="rounded-lg border border-dashed border-emerald-300 bg-white px-4 py-3 text-sm text-slate-600 md:col-span-2"
-                />
-                <p className="text-xs leading-5 text-slate-500 md:col-span-2">
-                  يرفع النظام الصور حتى 12 ميغابايت والفيديوهات حتى 45 ميغابايت إلى مساحة تخزين دائمة. يمكن بدلاً من ذلك إدخال رابط لمادة منشورة ومصرح بها.
-                </p>
-                <input
                   type="url"
-                  placeholder="رابط المادة عند عدم رفع ملف (اختياري)"
+                  placeholder="رابط مشاركة الملف من Google Drive"
                   value={mediaDraft.mediaUrl}
                   onChange={(event) => setMediaDraft({ ...mediaDraft, mediaUrl: event.target.value })}
                   className="rounded-lg border border-slate-200 bg-white px-4 py-3 outline-none ring-emerald-500 transition focus:ring-2 md:col-span-2"
                 />
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900 md:col-span-2">
+                  <strong>رفع عبر Google Drive:</strong> ارفعي الملف إلى Drive، من «مشاركة» اختاري «أي شخص لديه الرابط»، ثم الصقي الرابط هنا. لا تضعي روابط خاصة أو مواداً تكشف بيانات المستفيدين.
+                </div>
                 <textarea
                   placeholder="بيان الحقوق أو مصدر المادة والموافقة"
                   value={mediaDraft.rightsNote}
@@ -1261,7 +1247,7 @@ export default function AdminDashboard() {
                       </div>
                       <p className="line-clamp-2 text-sm leading-6 text-slate-600">{item.description}</p>
                       <div className="flex gap-2">
-                        <Button variant="outline" className="flex-1" onClick={() => { setEditingMediaId(item.id || null); setSelectedMediaFile(null); setMediaDraft({ ...item, projectId: item.projectId || "", thumbnailUrl: item.thumbnailUrl || "", capturedAt: item.capturedAt || "", location: item.location || "" }); }}>تعديل</Button>
+                        <Button variant="outline" className="flex-1" onClick={() => { setEditingMediaId(item.id || null); setMediaDraft({ ...item, projectId: item.projectId || "", thumbnailUrl: item.thumbnailUrl || "", capturedAt: item.capturedAt || "", location: item.location || "" }); }}>تعديل</Button>
                         <Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50" onClick={() => item.id && handleDeleteMedia(item.id)}>حذف</Button>
                       </div>
                     </div>
