@@ -34,7 +34,11 @@ describe("أسس موقع المؤسسة الثابت", () => {
     expect(app).toContain("GitHubAdminHub");
     expect(hub).toContain("/admin/");
     expect(existsSync(resolve(process.cwd(), "client/public/admin/config.yml"))).toBe(true);
-    expect(readProjectFile("client/public/admin/config.yml")).toContain("name: github");
+    const cms = readProjectFile("client/public/admin/config.yml");
+    expect(cms).toContain("name: github");
+    expect(cms).toContain("name: homepage");
+    expect(cms).toContain("name: navigation");
+    expect(cms).toContain("name: about");
   });
 
   it("يتضمن إعداد Vercel صريحاً لبناء Vite ومسارات SPA", () => {

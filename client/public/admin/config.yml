@@ -25,6 +25,48 @@ collections:
               - { label: طلاب، name: students, widget: number, value_type: int, required: false }
               - { label: حالات صحية، name: patients, widget: number, value_type: int, required: false }
               - { label: أسر، name: families, widget: number, value_type: int, required: false }
+              - label: الصفحة الرئيسية
+                name: homepage
+                widget: object
+                required: false
+                fields:
+                  - label: البطل
+                    name: hero
+                    widget: object
+                    required: false
+                    fields:
+                      - { label: العنوان الصغير، name: eyebrow, widget: string, required: false }
+                      - { label: العنوان، name: title, widget: string, required: false }
+                      - { label: الوصف، name: description, widget: text, required: false }
+                      - { label: زر التبرع، name: primaryCtaLabel, widget: string, required: false }
+                      - { label: زر الشراكات، name: secondaryCtaLabel, widget: string, required: false }
+                      - { label: عنوان الرسالة الجانبية، name: sideTitle, widget: string, required: false }
+                      - { label: وصف الرسالة الجانبية، name: sideDescription, widget: text, required: false }
+                      - { label: زر الرسالة الجانبية، name: sideCtaLabel, widget: string, required: false }
+                      - { label: نقاط الثقة، name: trustPoints, widget: list, required: false }
+                  - label: ترتيب الأقسام
+                    name: sectionOrder
+                    widget: list
+                    required: false
+                    field: { label: القسم, name: section, widget: select, options: [impact, priorities, programs, partnerships, media, donate] }
+              - label: التنقل والتذييل
+                name: navigation
+                widget: object
+                required: false
+                fields:
+                  - { label: اسم العلامة المختصر، name: brandShortName, widget: string, required: false }
+                  - { label: نص زر التبرع، name: donateLabel, widget: string, required: false }
+                  - { label: وصف التذييل، name: footerDescription, widget: text, required: false }
+              - label: صفحة عن المؤسسة
+                name: about
+                widget: object
+                required: false
+                fields:
+                  - { label: الشعار أو الرسالة، name: tagline, widget: string, required: false }
+                  - { label: عنوان مجالات العمل، name: workAreasHeading, widget: string, required: false }
+                  - { label: وصف مجالات العمل، name: workAreasDescription, widget: text, required: false }
+                  - { label: عنوان الحوكمة، name: governanceTitle, widget: string, required: false }
+                  - { label: وصف الحوكمة، name: governanceDescription, widget: text, required: false }
           - label: البرامج
             name: projects
             widget: list
