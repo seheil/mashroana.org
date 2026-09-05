@@ -21,10 +21,10 @@ collections:
             name: settings
             widget: object
             fields:
-              - { label: أيتام، name: orphans, widget: number, value_type: int, required: false }
-              - { label: طلاب، name: students, widget: number, value_type: int, required: false }
-              - { label: حالات صحية، name: patients, widget: number, value_type: int, required: false }
-              - { label: أسر، name: families, widget: number, value_type: int, required: false }
+              - { label: أيتام, name: orphans, widget: number, value_type: int, required: false }
+              - { label: طلاب, name: students, widget: number, value_type: int, required: false }
+              - { label: حالات صحية, name: patients, widget: number, value_type: int, required: false }
+              - { label: أسر, name: families, widget: number, value_type: int, required: false }
               - label: الصفحة الرئيسية
                 name: homepage
                 widget: object
@@ -35,15 +35,15 @@ collections:
                     widget: object
                     required: false
                     fields:
-                      - { label: العنوان الصغير، name: eyebrow, widget: string, required: false }
-                      - { label: العنوان، name: title, widget: string, required: false }
-                      - { label: الوصف، name: description, widget: text, required: false }
-                      - { label: زر التبرع، name: primaryCtaLabel, widget: string, required: false }
-                      - { label: زر الشراكات، name: secondaryCtaLabel, widget: string, required: false }
-                      - { label: عنوان الرسالة الجانبية، name: sideTitle, widget: string, required: false }
-                      - { label: وصف الرسالة الجانبية، name: sideDescription, widget: text, required: false }
-                      - { label: زر الرسالة الجانبية، name: sideCtaLabel, widget: string, required: false }
-                      - { label: نقاط الثقة، name: trustPoints, widget: list, required: false }
+                      - { label: العنوان الصغير, name: eyebrow, widget: string, required: false }
+                      - { label: العنوان, name: title, widget: string, required: false }
+                      - { label: الوصف, name: description, widget: text, required: false }
+                      - { label: زر التبرع, name: primaryCtaLabel, widget: string, required: false }
+                      - { label: زر الشراكات, name: secondaryCtaLabel, widget: string, required: false }
+                      - { label: عنوان الرسالة الجانبية, name: sideTitle, widget: string, required: false }
+                      - { label: وصف الرسالة الجانبية, name: sideDescription, widget: text, required: false }
+                      - { label: زر الرسالة الجانبية, name: sideCtaLabel, widget: string, required: false }
+                      - { label: نقاط الثقة, name: trustPoints, widget: list, required: false }
                   - label: ترتيب الأقسام
                     name: sectionOrder
                     widget: list
@@ -54,59 +54,59 @@ collections:
                 widget: object
                 required: false
                 fields:
-                  - { label: اسم العلامة المختصر، name: brandShortName, widget: string, required: false }
-                  - { label: نص زر التبرع، name: donateLabel, widget: string, required: false }
-                  - { label: وصف التذييل، name: footerDescription, widget: text, required: false }
+                  - { label: اسم العلامة المختصر, name: brandShortName, widget: string, required: false }
+                  - { label: نص زر التبرع, name: donateLabel, widget: string, required: false }
+                  - { label: وصف التذييل, name: footerDescription, widget: text, required: false }
               - label: صفحة عن المؤسسة
                 name: about
                 widget: object
                 required: false
                 fields:
-                  - { label: الشعار أو الرسالة، name: tagline, widget: string, required: false }
-                  - { label: عنوان مجالات العمل، name: workAreasHeading, widget: string, required: false }
-                  - { label: وصف مجالات العمل، name: workAreasDescription, widget: text, required: false }
-                  - { label: عنوان الحوكمة، name: governanceTitle, widget: string, required: false }
-                  - { label: وصف الحوكمة، name: governanceDescription, widget: text, required: false }
+                  - { label: الشعار أو الرسالة, name: tagline, widget: string, required: false }
+                  - { label: عنوان مجالات العمل, name: workAreasHeading, widget: string, required: false }
+                  - { label: وصف مجالات العمل, name: workAreasDescription, widget: text, required: false }
+                  - { label: عنوان الحوكمة, name: governanceTitle, widget: string, required: false }
+                  - { label: وصف الحوكمة, name: governanceDescription, widget: text, required: false }
           - label: البرامج
             name: projects
             widget: list
             fields:
-              - { label: المعرف، name: id, widget: string }
-              - { label: الاسم، name: name, widget: string }
-              - { label: الوصف، name: description, widget: text }
-              - { label: الرمز، name: icon, widget: string, required: false }
+              - { label: المعرف, name: id, widget: string }
+              - { label: الاسم, name: name, widget: string }
+              - { label: الوصف, name: description, widget: text }
+              - { label: الرمز, name: icon, widget: string, required: false }
           - label: الإنجازات
             name: achievements
             widget: list
             fields:
-              - { label: العنوان، name: title, widget: string }
-              - { label: الوصف، name: description, widget: text }
-              - { label: السنة، name: year, widget: number, value_type: int }
-              - { label: الرمز، name: icon, widget: string }
-              - { label: رابط الصورة، name: imagePath, widget: string, required: false }
+              - { label: العنوان, name: title, widget: string }
+              - { label: الوصف, name: description, widget: text }
+              - { label: السنة, name: year, widget: number, value_type: int }
+              - { label: الرمز, name: icon, widget: string }
+              - { label: رابط الصورة, name: imagePath, widget: string, required: false }
           - label: وسائط منشورة
             name: media
             widget: list
             fields:
-              - { label: العنوان، name: title, widget: string }
-              - { label: الوصف، name: description, widget: text }
-              - { label: النوع، name: kind, widget: select, options: [image, video] }
-              - { label: الرابط أو الملف، name: mediaUrl, widget: string }
-              - { label: الوصف البديل، name: altText, widget: string }
-              - { label: الفئة، name: category, widget: string }
-              - { label: حقوق الاستخدام، name: rightsNote, widget: text }
-              - { label: حالة النشر، name: status, widget: select, options: [draft, published, archived] }
-              - { label: موافقة النشر، name: consentConfirmed, widget: boolean, default: false }
+              - { label: العنوان, name: title, widget: string }
+              - { label: الوصف, name: description, widget: text }
+              - { label: النوع, name: kind, widget: select, options: [image, video] }
+              - { label: الرابط أو الملف, name: mediaUrl, widget: string }
+              - { label: الوصف البديل, name: altText, widget: string }
+              - { label: الفئة, name: category, widget: string }
+              - { label: حقوق الاستخدام, name: rightsNote, widget: text }
+              - { label: حالة النشر, name: status, widget: select, options: [draft, published, archived] }
+              - { label: موافقة النشر, name: consentConfirmed, widget: boolean, default: false }
           - label: أولويات التبرع
             name: donationPriorities
             widget: list
             fields:
-              - { label: العنوان، name: title, widget: string }
-              - { label: الوصف، name: description, widget: text }
-              - { label: معرف البرنامج، name: programId, widget: string }
-              - { label: اسم البرنامج، name: programName, widget: string }
-              - { label: النوع، name: kind, widget: select, options: [program, seasonal, urgent] }
-              - { label: الحالة، name: status, widget: select, options: [draft, published, closed] }
-              - { label: وزن التوصية، name: recommendationWeight, widget: number, value_type: int }
-              - { label: السبب، name: reason, widget: text }
-              - { label: مصدر التحقق، name: sourceNote, widget: text }
+              - { label: العنوان, name: title, widget: string }
+              - { label: الوصف, name: description, widget: text }
+              - { label: معرف البرنامج, name: programId, widget: string }
+              - { label: اسم البرنامج, name: programName, widget: string }
+              - { label: النوع, name: kind, widget: select, options: [program, seasonal, urgent] }
+              - { label: الحالة, name: status, widget: select, options: [draft, published, closed] }
+              - { label: وزن التوصية, name: recommendationWeight, widget: number, value_type: int }
+              - { label: السبب, name: reason, widget: text }
+              - { label: مصدر التحقق, name: sourceNote, widget: text }
