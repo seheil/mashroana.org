@@ -334,3 +334,6 @@
 
 - [x] إصلاح خطأ YAML في `client/public/cms/config.yml` الذي يمنع تحميل لوحة CMS على الإنتاج
 - [x] إعادة فحص وبناء ورفع إصلاح CMS ثم التحقق من `/cms/`
+
+- [ ] استبدال عنوان OAuth التجريبي في `client/public/cms/config.yml` بعنوان Vercel الفعلي
+- [ ] إعادة نشر التصحيح والتحقق من رابط callback قبل اختبار CMS

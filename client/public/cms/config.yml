@@ -2,7 +2,7 @@ backend:
   name: github
   repo: seheil/mashroana.org
   branch: main
-  base_url: https://REPLACE_WITH_YOUR_VERCEL_DOMAIN.vercel.app
+  base_url: https://mashrouana-app.vercel.app
   auth_endpoint: api/auth
 
 locale: ar
