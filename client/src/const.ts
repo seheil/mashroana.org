@@ -4,6 +4,11 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 export const getLoginUrl = () => {
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
+
+  // The public GitHub/Vercel site does not use Manus OAuth. Keep the legacy
+  // hook harmless when those optional variables are absent in Vercel.
+  if (!oauthPortalUrl || !appId) return window.location.origin;
+
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
   const state = btoa(redirectUri);
 
